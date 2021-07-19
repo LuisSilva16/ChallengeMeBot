@@ -1,6 +1,4 @@
 import discord
-import os
-import uuid
 import random
 from enum import Enum
 
@@ -171,16 +169,16 @@ async def start(client, strMsg):
     flag = checkUserInQueue(strMsg)
     if flag:
         queueChannelId = client.get_channel(MatchStat.queueChannelId)
-        message = await queueChannelId.send("You are already in waiting queue, please wait for your opponent!")
+        await queueChannelId.send("You are already in waiting queue, please wait for your opponent!")
         return
 
     flag = checkExistingMatch(strMsg)
     if flag:
         queueChannelId = client.get_channel(MatchStat.queueChannelId)
-        message = await queueChannelId.send("You are already in a match, please finish your match!")
+        await queueChannelId.send("You are already in a match, please finish your match!")
     else:
         queueChannelId = client.get_channel(MatchStat.queueChannelId)
-        message = await queueChannelId.send("You have been added to the queue, waiting for opponent...")
+        await queueChannelId.send("You have been added to the queue, waiting for opponent...")
         waitingQueue.append(strMsg.author.id)
     #await dummyTest(client)
 
@@ -493,6 +491,8 @@ async def victoryDecision(client, payload, match):
         message = await sendMessage(client, match)
         match.message = message.id
 
+        replace(match, lambda x: x.message == oldmessage)
+
 async def victoryConfirm(client, payload, match):
     flag = False
     decision = False
@@ -518,24 +518,7 @@ async def victoryConfirm(client, payload, match):
         message = await sendMessage(client, match)
         match.message = message.id
 
-def contains(filter):
-    if listOfMatches:
-        for match in listOfMatches:
-            if filter(match):
-                return True
-    return False
-
-def replace(newMatch, filter):
-    if listOfMatches:
-        for index, match in enumerate(listOfMatches):
-            if filter(match):
-                listOfMatches[index] = newMatch
-                pass
-
-def get(filter):
-    if listOfMatches:
-        return next((x for x in listOfMatches if filter), None)
-    return None
+        replace(match, lambda x: x.message == oldmessage)
 
 def arrangeBans(match):
     if match.round == 1:
@@ -552,12 +535,12 @@ def arrangeBans(match):
             completeList.remove(match.lastWon1)
     elif Ruleset.isTSR:
         if match.winner[-1] == match.player1 and match.lastWon2 != "":
-            for counter in counterPicks:
+            for counter in Ruleset.counterPicks:
                 if counter == match.lastWon2:
                     completeList.remove(match.lastWon2)
                     pass
         elif match.winner[-1] == match.player2 and match.lastWon1 != "":
-            for counter in counterPicks:
+            for counter in Ruleset.counterPicks:
                 if counter == match.lastWon1:
                     completeList.remove(match.lastWon1)
                     pass
@@ -593,6 +576,25 @@ async def add_victory_reaction(message):
 async def add_decision_reaction(message):
     await message.add_reaction("🇾") # confirm
     await message.add_reaction("🇳") # reject
+
+def contains(filter):
+    if listOfMatches:
+        for match in listOfMatches:
+            if filter(match):
+                return True
+    return False
+
+def replace(newMatch, filter):
+    if listOfMatches:
+        for index, match in enumerate(listOfMatches):
+            if filter(match):
+                listOfMatches[index] = newMatch
+                pass
+
+def get(filter):
+    if listOfMatches:
+        return next((x for x in listOfMatches if filter), None)
+    return None
 
 def getEmote(text):
     emote = "0️⃣"
