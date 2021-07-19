@@ -190,16 +190,20 @@ async def searchForMatch(client):
     if waitingQueue and len(waitingQueue) >= 2 and not lockedQueue:
         lockedQueue = True
         currentQueue = waitingQueue
+        while currentQueue >= 2:
+            player1Id = currentQueue[0]
+            player2Id = currentQueue[1]
 
-        # TO DO: Multi send
+            # TO DO: Multi send and remove
 
-        player1Id = currentQueue[0]
-        player2Id = currentQueue[1]
+            await sendMessage(client, player1=player1Id, player2=player2Id)
 
-        waitingQueue.remove(player1Id)
-        waitingQueue.remove(player2Id)
+            currentQueue.remove(player1Id)
+            currentQueue.remove(player2Id)
 
-        await sendMessage(client, player1=player1Id, player2=player2Id)
+            waitingQueue.remove(player1Id)
+            waitingQueue.remove(player2Id)
+            
         lockedQueue = False
 
 async def sendMessage(client, match=None, player1=0, player2=0):
