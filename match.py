@@ -187,13 +187,14 @@ async def start(client, strMsg):
 async def searchForMatch(client):
     global waitingQueue
     global lockedQueue
-    if searchForMatch and len(waitingQueue) >= 2 and not lockedQueue:
+    if waitingQueue and len(waitingQueue) >= 2 and not lockedQueue:
         lockedQueue = True
+        currentQueue = waitingQueue
 
         # TO DO: Multi send
 
-        player1Id = waitingQueue[0]
-        player2Id = waitingQueue[1]
+        player1Id = currentQueue[0]
+        player2Id = currentQueue[1]
 
         waitingQueue.remove(player1Id)
         waitingQueue.remove(player2Id)
