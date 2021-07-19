@@ -40,10 +40,13 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if message.content.startswith('!matchme') and message.channel.id == match.MatchStat.queueChannelId:
-        await match.start(client, message)
+    if message.content == '!match' and message.channel.id == match.MatchStat.queueChannelId:
+        await match.queue(client, message)
+
+    if message.content == '!unmatch' and message.channel.id == match.MatchStat.queueChannelId:
+        await match.unqueue(client, message)
     
-    if message.content.startswith('!char') and isinstance(message.channel, discord.channel.DMChannel):
+    if message.content.startswith('!char ') and isinstance(message.channel, discord.channel.DMChannel):
         await match.validateChar(client, message)
 
 @client.event
@@ -52,16 +55,19 @@ async def on_raw_reaction_add(payload):
         return
 
     await replace_role(payload, True)
-    matchFound = await match.getValidMatch(client, payload)
+    matchFound = await match.getValidMatch(payload)
     if matchFound is None:
         return
 
-    if matchFound.status == match.MatchStatus.STRIKING:
-        await match.stageStriking(client, payload, matchFound)
-    elif matchFound.status == match.MatchStatus.PLAYING:
-        await match.victoryDecision(client, payload, matchFound)
-    elif matchFound.status == match.MatchStatus.RESULTS:
-        await match.victoryConfirm(client, payload, matchFound)
+    if matchFound.status != match.MatchStatus.END and matchFound.forfeitMessage == payload.message_id and (payload.emoji.name == "🤝" or payload.emoji.name == "🏳️"):
+        await match.tieOrForfeit(client, payload, matchFound)
+    elif matchFound.chooser == payload.user_id and matchFound.message == payload.message_id:
+        if matchFound.status == match.MatchStatus.STRIKING:
+            await match.stageStriking(client, payload, matchFound)
+        elif matchFound.status == match.MatchStatus.PLAYING:
+            await match.victoryDecision(client, payload, matchFound)
+        elif matchFound.status == match.MatchStatus.RESULTS:
+            await match.victoryConfirm(client, payload, matchFound)
 
 @client.event
 async def on_raw_reaction_remove(payload):

@@ -1,11 +1,18 @@
 import discord
 import random
 from enum import Enum
+from datetime import datetime
+from datetime import timedelta
 
 waitingQueue = []
 listOfMatches = []
 
 lockedQueue = False
+
+class QueuedPlayer:
+    def __init__(self, userId):
+        self.userId = userId
+        self.expiration = datetime.utcnow() + timedelta(minutes=30)
 
 class MatchStat:
     queueChannelId = 0
@@ -115,12 +122,21 @@ class Ruleset:
     dsrMaxBans = 2
     noDSRMaxBans = 3
 
+class ScrapMatch:
+    def __init__(self, player1, player2):
+        self.player1 = player1
+        self.player2 = player2
+
 class Match:
-    def __init__(self, message, player1, player2, chooser, isBo5):
+    def __init__(self, message, guild, player1, player2, chooser, isBo5, promotion):
         self.message = message
+        self.guild = guild
+        self.forfeitMessage = 0
         self.player1 = player1
         self.player2 = player2
         self.winner = []
+        self.tie = False
+        self.surrendered = False
         self.score1 = 0
         self.score2 = 0
         self.player1chars = []
@@ -133,6 +149,7 @@ class Match:
         self.dsrBans = []
         self.lastWon1 = ""
         self.lastWon2 = ""
+        self.promotion = promotion
 
     def incrementScore(self):
         if Ruleset.isDSR:
@@ -155,6 +172,25 @@ class Match:
             self.round += 1
             self.bans = []
 
+    def forfeit(self, player):
+        self.status = MatchStatus.END
+        if player == self.player1:
+            self.score1 = -1
+            self.score2 = 0
+            self.winner = [self.player2]
+        elif player == self.player2:
+            self.score1 = 0
+            self.score2 = -1
+            self.winner = [self.player1]
+        self.surrendered = True
+
+    def tieScore(self):
+        self.status = MatchStatus.END
+        self.score1 = 0
+        self.score2 = 0
+        self.winner = []
+        self.tie = True
+
 def ready():
     MatchStat.queueChannelId = 865882258636406804
     MatchStat.matchChannelId = 865882224553623552
@@ -167,44 +203,81 @@ async def getRankingRole(guild):
     
     return myRole
 
-async def start(client, strMsg):
+async def queue(client, strMsg):
     flag = checkUserInQueue(strMsg)
     if flag:
         queueChannelId = client.get_channel(MatchStat.queueChannelId)
-        await queueChannelId.send("You are already in waiting queue, please wait for your opponent!")
+        await queueChannelId.send("<@" + str(strMsg.author.id) + ">, you are already in waiting queue, please wait for your opponent!")
         return
 
     flag = checkExistingMatch(strMsg)
     if flag:
         queueChannelId = client.get_channel(MatchStat.queueChannelId)
-        await queueChannelId.send("You are already in a match, please finish your match!")
+        await queueChannelId.send("<@" + str(strMsg.author.id) + ">, you are already in a match, please finish your match!")
     else:
         queueChannelId = client.get_channel(MatchStat.queueChannelId)
-        await queueChannelId.send("You have been added to the queue, waiting for opponent...")
+        await queueChannelId.send("<@" + str(strMsg.author.id) + ">, you have been added to the queue, waiting for opponent...")
         global waitingQueue
-        waitingQueue.append(strMsg.author.id)
+        queuedPlayer = QueuedPlayer(strMsg.author.id)
+        waitingQueue.append(queuedPlayer)
+
+async def unqueue(client, strMsg):
+    queueChannelId = client.get_channel(MatchStat.queueChannelId)
+    flag = checkExistingMatch(strMsg)
+    if flag:
+        await queueChannelId.send("<@" + str(strMsg.author.id) + ">, you are already in a match, please finish your match!")
+        return
+
+    flag = False
+    if waitingQueue:
+        for user in waitingQueue:
+            if user.userId == strMsg.author.id:
+                await queueChannelId.send("<@" + str(strMsg.author.id) + ">, you have been removed from the queue by request!")
+                waitingQueue.remove(user)
+                flag = True
+                pass
+
+    if not flag:
+        await queueChannelId.send("<@" + str(strMsg.author.id) + ">, you are not in any queue!")
+    
 
 async def searchForMatch(client):
     global waitingQueue
     global lockedQueue
-    if waitingQueue and len(waitingQueue) >= 2 and not lockedQueue:
-        lockedQueue = True
-        currentQueue = waitingQueue
-        while currentQueue >= 2:
-            player1Id = currentQueue[0]
-            player2Id = currentQueue[1]
+    if not lockedQueue:
+        count = len(waitingQueue)
+        if count >= 2:
+            lockedQueue = True           
+            scrapMatches = await try_match(client)
+            if scrapMatches:
+                for scrapMatch in scrapMatches:
+                    await sendMessage(client, player1=scrapMatch.player1.userId, player2=scrapMatch.player2.userId)
 
-            # TO DO: Multi send and remove
+                    waitingQueue.remove(scrapMatch.player1)
+                    waitingQueue.remove(scrapMatch.player2)
+                
+            lockedQueue = False
+        elif count == 1:
+            if datetime.utcnow() >= waitingQueue[0].expiration:
+                await removeFromQueue(client, waitingQueue[0])
 
-            await sendMessage(client, player1=player1Id, player2=player2Id)
+async def try_match(client):
+    global waitingQueue
+    for queuedPlayer in waitingQueue:
+        if datetime.utcnow() >= queuedPlayer.expiration:
+            await removeFromQueue(client, queuedPlayer)
 
-            currentQueue.remove(player1Id)
-            currentQueue.remove(player2Id)
+    # db connection and handling
 
-            waitingQueue.remove(player1Id)
-            waitingQueue.remove(player2Id)
-            
-        lockedQueue = False
+    scrapMatches = [ScrapMatch(waitingQueue[0], waitingQueue[1])]
+    return scrapMatches
+
+async def removeFromQueue(client, queuedPlayer):
+    global waitingQueue
+    queueChannelId = client.get_channel(MatchStat.queueChannelId)
+    await queueChannelId.send("<@" + str(queuedPlayer.userId) + ">, we couldn't find you an opponent for ranked and you have been removed from the queue, please try again later.")
+    waitingQueue.remove(queuedPlayer)
+
 
 async def sendMessage(client, match=None, player1=0, player2=0):
     matchChannelId = client.get_channel(MatchStat.matchChannelId)
@@ -263,25 +336,45 @@ async def sendMessage(client, match=None, player1=0, player2=0):
             description = "Confirm your result <@" + str(match.chooser) + ">!"
             fields = []
         elif match.status == MatchStatus.END:
-            title = "GAME!"
-            if match.winner[-1] == match.player1:
-                winner = match.player1
-                loser = match.player2
-            elif match.winner[-1] == match.player2:
-                winner = match.player2
-                loser = match.player1
+            if match.tie:
+                title = "NO CONTEST!"
+                mainMessage = "TIE! <@" + str(match.player1) + "> and <@" + str(match.player2) + "> agreed to a tie. \n"
+                description = "How anticlimatic..."
+            else:
+                title = "GAME!"
+                if match.winner[-1] == match.player1:
+                    winner = match.player1
+                    loser = match.player2
+                elif match.winner[-1] == match.player2:
+                    winner = match.player2
+                    loser = match.player1
 
-            mainMessage = "<@" + str(winner) + "> is the winner of this set! Congratulations! GGs! \n"
-            description = "Better luck next time <@" + str(loser) + ">! Don't be salty and shake your opponent's hand!"
+                mainMessage = "<@" + str(winner) + "> is the winner of this set! Congratulations! GGs! \n"
+                if match.forfeit:
+                    description = "Not like this, <@" + str(loser) + ">..."
+                else:
+                    description = "Better luck next time <@" + str(loser) + ">! Don't be salty and shake your opponent's hand!"
             fields = []
 
     if match is None:
         mainMessageSuffix = "**<@" + str(player1) + ">** vs. **<@"+ str(player2) +">** \n **Score**: 0 - 0"
     else:
         if match.status == MatchStatus.END:
-            characters1 = buildCharacterList(match.player1chars)
-            characters2 = buildCharacterList(match.player2chars)
-            mainMessageSuffix = "**<@" + str(match.player1) + ">** *(" + characters1 + ")* vs. **<@"+ str(match.player2) +">** *(" + characters2 + ")* \n **Score**: " + str(match.score1) + " - " + str(match.score2)
+            if match.tie:
+                mainMessageSuffix = "**<@" + str(match.player1) + ">** vs. **<@"+ str(match.player2) +">** \n **Score**: TIE"
+            elif match.surrendered:
+                if match.score1 == -1:
+                    score1 = "DQ"
+                    score2 = "W"
+                elif match.score2 == -1:
+                    score1 = "W"
+                    score2 = "DQ"
+                mainMessageSuffix = "**<@" + str(match.player1) + ">** vs. **<@"+ str(match.player2) +">** \n **Score**: " + score1 + " - " + score2
+            else:
+                characters1 = buildCharacterList(match.player1chars)
+                characters2 = buildCharacterList(match.player2chars)
+                mainMessageSuffix = "**<@" + str(match.player1) + ">** *(" + characters1 + ")* vs. **<@"+ str(match.player2) +">** *(" + characters2 + ")* \n **Score**: " + str(match.score1) + " - " + str(match.score2)
+
         elif match.player1chars and match.player2chars and len(match.player1chars) == match.round and len(match.player2chars) == match.round:
             mainMessageSuffix = "**<@" + str(match.player1) + ">** *(" + match.player1chars[match.round - 1] + ")* vs. **<@"+ str(match.player2) +">** *(" + match.player2chars[match.round - 1] + ")* \n **Score**: " + str(match.score1) + " - " + str(match.score2)
         else:
@@ -294,12 +387,15 @@ async def sendMessage(client, match=None, player1=0, player2=0):
         embed.add_field(name=name, value=value, inline=inline)
 
     message = await matchChannelId.send(mainMessage, embed=embed)
+    global listOfMatches
     if match is None:
-        global listOfMatches
-        match = Match(message.id, player1, player2, playerChosen, False)
-        listOfMatches.append(match)
+        match = Match(message.id, message.guild.id, player1, player2, playerChosen, False, False)
 
         await sendMessageToUser(client, player1)
+        forfeitMessage = await sendTieOrForfeitMessage(client, match)
+        match.forfeitMessage = forfeitMessage.id
+
+        listOfMatches.append(match)
         
     if match.status == MatchStatus.STRIKING:
         await add_ban_reaction(message, listOfBans)
@@ -308,9 +404,16 @@ async def sendMessage(client, match=None, player1=0, player2=0):
     elif match.status == MatchStatus.RESULTS:
         await add_decision_reaction(message)
     elif match.status == MatchStatus.END:
-        global listOfMatches
         listOfMatches.remove(match)
 
+    return message
+
+async def sendTieOrForfeitMessage(client, match):
+    matchChannelId = client.get_channel(MatchStat.matchChannelId)
+    embed = discord.Embed(title="Tie or Forfeit?", description="Both players need to agree on tie! \n Only one player can forfeit.")
+    mainMessage = "Tie or Forfeit? \n **<@" + str(match.player1) + ">** vs. **<@"+ str(match.player2) +">**"
+    message = await matchChannelId.send(mainMessage, embed=embed)
+    await add_tie_or_forfeit_reaction(message)
     return message
 
 def buildCharacterList(characters):
@@ -416,23 +519,56 @@ def checkUserInQueue(message):
     global waitingQueue
     if waitingQueue:
         for user in waitingQueue:
-            if user == message.author.id:
+            if user.userId == message.author.id:
                 return True
 
     return False
 
-async def getValidMatch(client, payload):
+async def getValidMatch(payload):
     if payload.channel_id != MatchStat.matchChannelId:       
         return None
-    if not contains(lambda x: (x.player1 == payload.user_id or x.player2 == payload.user_id) and x.chooser == payload.user_id):       
+    if not contains(lambda x: x.player1 == payload.user_id or x.player2 == payload.user_id):       
         return None
-    match = get(lambda x: (x.player1 == payload.user_id or x.player2 == payload.user_id) and x.chooser == payload.user_id)
+    match = get(lambda x: x.player1 == payload.user_id or x.player2 == payload.user_id)
     if match is None:
         return None
-    if payload.message_id != match.message:       
+    if payload.message_id != match.message and payload.message_id != match.forfeitMessage:       
         return None
     
     return match
+
+async def tieOrForfeit(client, payload, match):
+    flag = False
+    if payload.emoji.name == "🏳️":
+        flag = True
+        if payload.user_id == match.player1:
+            match.forfeit(match.player1)
+        elif payload.user_id == match.player2:
+            match.forfeit(match.player2)
+    elif payload.emoji.name == "🤝":
+        channel = client.get_channel(MatchStat.matchChannelId)
+        message = await channel.fetch_message(match.forfeitMessage)
+        if message.reactions:
+            for reaction in message.reactions:
+                if reaction.emoji == "🤝" and reaction.count >= 2:
+                    matchUsers = [match.player1, match.player2]
+                    users = await reaction.users().flatten()
+                    if all(x in list(map(lambda x: x.id, users)) for x in matchUsers):
+                        match.tieScore()
+                        flag = True
+                    pass
+
+    if flag:
+        channel = client.get_channel(MatchStat.matchChannelId)
+        message = await channel.fetch_message(match.message)
+        forfeitMessage = await channel.fetch_message(match.forfeitMessage)
+        oldmessage = message.id
+        messages = [message, forfeitMessage]
+        await channel.delete_messages(messages)
+        message = await sendMessage(client, match)
+        match.message = message.id
+
+        replace(match, lambda x: x.message == oldmessage)
 
 async def stageStriking(client, payload, match):
     text = getText(payload.emoji.name)
@@ -518,7 +654,11 @@ async def victoryConfirm(client, payload, match):
         channel = client.get_channel(MatchStat.matchChannelId)
         message = await channel.fetch_message(match.message)
         oldmessage = message.id
-        messages = [message]
+        if match.Status == MatchStatus.END:
+            forfeitMessage = await channel.fetch_message(match.forfeitMessage)
+            messages = [message, forfeitMessage]
+        else:
+            messages = [message]
         await channel.delete_messages(messages)
         message = await sendMessage(client, match)
         match.message = message.id
@@ -581,6 +721,10 @@ async def add_victory_reaction(message):
 async def add_decision_reaction(message):
     await message.add_reaction("🇾") # confirm
     await message.add_reaction("🇳") # reject
+
+async def add_tie_or_forfeit_reaction(message):
+    await message.add_reaction("🤝") # tie
+    await message.add_reaction("🏳️") # forfeit
 
 def contains(filter):
     global listOfMatches
