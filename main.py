@@ -88,6 +88,6 @@ async def replace_role(payload, flag):
 
 x = os.getenv('TOKEN')
 if x is None:
-    x = 'ODYzMzg4NTM5OTk5NDg1OTg0.YOmLPA.NjvBrMjTtjEZ-5GgWW-UGreHXdg'
+    x = ''
 
 client.run(x)
