@@ -5,6 +5,8 @@ from enum import Enum
 waitingQueue = []
 listOfMatches = []
 
+lockedQueue = False
+
 class MatchStat:
     queueChannelId = 0
     matchChannelId = 0
@@ -179,11 +181,17 @@ async def start(client, strMsg):
     else:
         queueChannelId = client.get_channel(MatchStat.queueChannelId)
         await queueChannelId.send("You have been added to the queue, waiting for opponent...")
+        global waitingQueue
         waitingQueue.append(strMsg.author.id)
-    #await dummyTest(client)
 
 async def searchForMatch(client):
-    if searchForMatch and len(waitingQueue) >= 2:
+    global waitingQueue
+    global lockedQueue
+    if searchForMatch and len(waitingQueue) >= 2 and not lockedQueue:
+        lockedQueue = True
+
+        # TO DO: Multi send
+
         player1Id = waitingQueue[0]
         player2Id = waitingQueue[1]
 
@@ -191,18 +199,7 @@ async def searchForMatch(client):
         waitingQueue.remove(player2Id)
 
         await sendMessage(client, player1=player1Id, player2=player2Id)
-
-async def dummyTest(client):
-    dummyMatch = Match(5, 865876220986130452, 183348380758573056, 865876220986130452, False)
-    dummyMatch.score1 = 2
-    dummyMatch.score2 = 1
-    dummyMatch.player1chars = ["Mario", "Luigi", "Mario"]
-    dummyMatch.player2chars = ["Mario", "Luigi", "Wario"]
-    dummyMatch.status = MatchStatus.END
-    dummyMatch.winner.append(865876220986130452)
-    listOfMatches.append(dummyMatch)
-    
-    await sendMessage(client, dummyMatch)
+        lockedQueue = False
 
 async def sendMessage(client, match=None, player1=0, player2=0):
     matchChannelId = client.get_channel(MatchStat.matchChannelId)
@@ -293,6 +290,7 @@ async def sendMessage(client, match=None, player1=0, player2=0):
 
     message = await matchChannelId.send(mainMessage, embed=embed)
     if match is None:
+        global listOfMatches
         match = Match(message.id, player1, player2, playerChosen, False)
         listOfMatches.append(match)
 
@@ -305,6 +303,7 @@ async def sendMessage(client, match=None, player1=0, player2=0):
     elif match.status == MatchStatus.RESULTS:
         await add_decision_reaction(message)
     elif match.status == MatchStatus.END:
+        global listOfMatches
         listOfMatches.remove(match)
 
     return message
@@ -409,6 +408,7 @@ def checkExistingMatch(message):
     return False
 
 def checkUserInQueue(message):
+    global waitingQueue
     if waitingQueue:
         for user in waitingQueue:
             if user == message.author.id:
@@ -578,6 +578,7 @@ async def add_decision_reaction(message):
     await message.add_reaction("🇳") # reject
 
 def contains(filter):
+    global listOfMatches
     if listOfMatches:
         for match in listOfMatches:
             if filter(match):
@@ -585,6 +586,7 @@ def contains(filter):
     return False
 
 def replace(newMatch, filter):
+    global listOfMatches
     if listOfMatches:
         for index, match in enumerate(listOfMatches):
             if filter(match):
@@ -592,6 +594,7 @@ def replace(newMatch, filter):
                 pass
 
 def get(filter):
+    global listOfMatches
     if listOfMatches:
         return next((x for x in listOfMatches if filter), None)
     return None
