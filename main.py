@@ -15,19 +15,24 @@ adminUserCommands = ["!adminusercancelset",
 "!adminuserremovefromqueue"]
 
 adminChannelCommands = ["!adminchannelsetqueue", 
-"!adminchannelsetmatch"]
+"!adminchannelsetmatch",
+"!adminchannelsetflair"]
 
 adminTextCommands = ["!adminconfigclearqueue",
 "!adminconfigsetdsr",
 "!adminconfigsetmdsr",
 "!adminconfigsettsr",
+"!adminconfigsetnodsr",
+"!adminconfigsetbancount",
 "!adminconfigaddstarter",
 "!adminconfigremovestarter"
 "!adminconfigaddcp",
 "!adminconfigremovecp",
 "!adminconfigaddstaffrole",
 "!adminconfigremovestaffrole",
-"!adminconfigsetrankingrole"]
+"!adminconfigsetrankingrole",
+"!adminconfigsendflairmessage",
+"!adminconfigsetflairmessage"]
 
 adminInitServer = "!admininitserver"
 adminHelp = "!adminhelp"
@@ -50,7 +55,7 @@ async def on_ready():
 
     print('We have logged in as {0.user}'.format(client))
     
-    message = await channel.send("React to me! \nUse our commands that you can find by typing \"!help\"")
+    message = await channel.send("React to me! \nUse our commands that you can find by typing \"!matchhelp\"")
     await message.add_reaction("🥏")
     
     match.ready(863389639901052969, message.id)
@@ -65,16 +70,16 @@ async def on_message(message):
     adminChannelId = match.MatchStat.getAdminChannelId(message.guild.id)
     queueChannelId = match.MatchStat.getQueueChannelId(message.guild.id)
 
-    if message.content == '!match' and message.channel.id == queueChannelId:
+    if message.content == '!match' and queueChannelId != 0 and message.channel.id == queueChannelId:
         await match.queue(client, message)
 
-    if message.content == '!unmatch' and message.channel.id == queueChannelId:
+    if message.content == '!unmatch' and queueChannelId != 0 and message.channel.id == queueChannelId:
         await match.unqueue(client, message)
     
     if message.content.startswith('!char') and isinstance(message.channel, discord.channel.DMChannel):
         await match.validateChar(client, message)
 
-    if message.content == "!queuehelp" and message.channel.id == queueChannelId:
+    if message.content == "!matchhelp" and queueChannelId != 0 and message.channel.id == queueChannelId:
         print("HELP!")
 
     # ADMIN Commands
@@ -96,6 +101,7 @@ async def on_message(message):
             elif message.content.startswith('!admininitserver'):
                 if len(message.raw_channel_mentions) == 1:
                     match.adminInitServer(message.guild.id, message.raw_channel_mentions[0])
+                    adminChannelId = match.MatchStat.getAdminChannelId(message.guild.id)
                     channel = client.get_channel(adminChannelId)
                     await channel.send("<@" + str(message.author.id) + ">, bot initialized! But you need to configure the following: \n\n - Queue channel;\n - Match channel;\n - Flair channel;\n - Flair message. \n\n Use our commands that you can find by typing \"!adminhelp\"!")
             elif adminChannelId != 0:
@@ -147,6 +153,9 @@ async def on_message(message):
                             elif message.content.startswith('!adminchannelsetmatch'):
                                 match.adminSetMatchChannel(guildId, channel)
                                 await channel.send("<@" + str(message.author.id) + ">, the match channel has been set to <#" + str(newChannel) + ">!")
+                            elif message.content.startswith('!adminchannelsetflair'):
+                                match.adminSetFlairChannel(guildId, channel)
+                                await channel.send("<@" + str(message.author.id) + ">, the flair channel has been set to <#" + str(newChannel) + ">!")
 
                     elif message.content.startswith("!adminconfig"):
                         if message.content.startswith('!adminconfigclearqueue'):
@@ -173,6 +182,14 @@ async def on_message(message):
                             await match.adminAddCP(guildId, channel, message)
                         elif message.content.startswith('!adminconfigremovecp'):
                             await match.adminRemoveCP(guildId, channel, message)
+                        elif message.content.startswith('!adminconfigsendflairmessage'):
+                            success = await match.adminSendFlairMessage(client, guildId, message)
+                            if success:
+                                await channel.send("<@" + str(message.author.id) + ">, the flair message has been sent!")
+                            else:
+                                await channel.send("<@" + str(message.author.id) + ">, the flair channel has not yet been set!")
+                        elif message.content.startswith('!adminconfigsetflairmessage'):
+                            await match.adminSetFlairMessage(channel, message)
                         else:
                             if len(message.raw_role_mentions) != 1:
                                 await channel.send("<@" + str(message.author.id) + ">, invalid command: please only mention one role!")

@@ -30,48 +30,72 @@ class MatchStat:
     rulesets = {}
 
     def getQueueChannelId(guildId):
+        if not str(guildId) in MatchStat.queueChannelId:
+            MatchStat.queueChannelId[str(guildId)] = 0
+
         return MatchStat.queueChannelId[str(guildId)]
 
     def setQueueChannelId(guildId, channelId):
         MatchStat.queueChannelId[str(guildId)] = channelId
 
     def getMatchChannelId(guildId):
+        if not str(guildId) in MatchStat.matchChannelId:
+            MatchStat.matchChannelId[str(guildId)] = 0
+
         return MatchStat.matchChannelId[str(guildId)]
 
     def setMatchChannelId(guildId, channelId):
         MatchStat.matchChannelId[str(guildId)] = channelId
 
     def getAdminChannelId(guildId):
+        if not str(guildId) in MatchStat.adminChannelId:
+            MatchStat.adminChannelId[str(guildId)] = 0
+
         return MatchStat.adminChannelId[str(guildId)]
 
     def setAdminChannelId(guildId, channelId):
         MatchStat.adminChannelId[str(guildId)] = channelId
 
     def getFlairChannelId(guildId):
+        if not str(guildId) in MatchStat.flairChannelId:
+            MatchStat.flairChannelId[str(guildId)] = 0
+
         return MatchStat.flairChannelId[str(guildId)]
 
     def setFlairChannelId(guildId, channelId):
         MatchStat.flairChannelId[str(guildId)] = channelId
 
     def getFlairMessageId(guildId):
+        if not str(guildId) in MatchStat.flairMessageId:
+            MatchStat.flairMessageId[str(guildId)] = 0
+
         return MatchStat.flairMessageId[str(guildId)]
 
     def setFlairMessageId(guildId, messageId):
         MatchStat.flairMessageId[str(guildId)] = messageId
 
     def getRankingRole(guildId):
+        if not str(guildId) in MatchStat.rankingRoles:
+            MatchStat.rankingRoles[str(guildId)] = "Ranking1v1"
+
         return MatchStat.rankingRoles[str(guildId)]
 
     def setRankingRole(guildId, rankingRole):
         MatchStat.rankingRoles[str(guildId)] = rankingRole
 
     def getAdminRoles(guildId):
+        if not str(guildId) in MatchStat.rankingAdminRoles:
+            MatchStat.rankingAdminRoles[str(guildId)] = ["RankingStaff"]
+
         return MatchStat.rankingAdminRoles[str(guildId)]
 
     def setAdminRoles(guildId, adminRoles):
         MatchStat.rankingAdminRoles[str(guildId)] = adminRoles
     
     def getRuleset(guildId):
+        if not str(guildId) in MatchStat.rulesets:
+            MatchStat.rulesets[str(guildId)] = Ruleset()
+
         return MatchStat.rulesets[str(guildId)]
 
     def setRuleset(guildId, ruleset):
@@ -1127,3 +1151,36 @@ def adminSetQueueChannel(guildId, channelId):
 
 def adminSetMatchChannel(guildId, channelId):
     MatchStat.setMatchChannelId(guildId, channelId)
+
+def adminSetFlairChannel(guildId, channelId):
+    MatchStat.setFlairChannelId(guildId, channelId)
+
+async def adminSendFlairMessage(client, guildId, message):
+    channelId = MatchStat.getFlairChannelId(guildId)
+    if channelId != 0:
+        channel = client.get_channel(channelId)
+        if channel is not None:
+            message = await channel.send("React to me! \nUse our commands that you can find by typing \"!help\"")
+            await message.add_reaction("🥏")
+            MatchStat.setFlairMessageId(message.id)
+            return True
+    
+    return False
+
+async def adminSetFlairMessage(channel, message):
+    parts = message.content.split(" ", 1)
+    if len(parts) != 2:
+        await channel.send("<@" + str(message.author.id) + ">, invalid input!")
+    else:
+        count = 0
+        flag = True
+        try:
+            count = (int)(parts[1])
+        except ValueError:
+            flag = False
+
+        if flag:
+            MatchStat.setFlairMessageId(count)
+            await channel.send("<@" + str(message.author.id) + ">, the flair message has been set")
+        else:
+            await channel.send("<@" + str(message.author.id) + ">, invalid message!")
