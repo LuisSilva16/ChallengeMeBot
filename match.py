@@ -10,13 +10,75 @@ listOfMatches = []
 lockedQueue = False
 
 class QueuedPlayer:
-    def __init__(self, userId):
+    def __init__(self, userId, guildId):
         self.userId = userId
+        self.guildId = guildId
         self.expiration = datetime.utcnow() + timedelta(minutes=30)
 
 class MatchStat:
-    queueChannelId = 0
-    matchChannelId = 0
+    queueChannelId = {}
+    matchChannelId = {}
+    
+    adminChannelId = {}
+
+    flairChannelId = {}
+    flairMessageId = {}
+
+    rankingRoles = {}
+    rankingAdminRoles = {}
+
+    rulesets = {}
+
+    def getQueueChannelId(guildId):
+        return MatchStat.queueChannelId[str(guildId)]
+
+    def setQueueChannelId(guildId, channelId):
+        MatchStat.queueChannelId[str(guildId)] = channelId
+
+    def getMatchChannelId(guildId):
+        return MatchStat.matchChannelId[str(guildId)]
+
+    def setMatchChannelId(guildId, channelId):
+        MatchStat.matchChannelId[str(guildId)] = channelId
+
+    def getAdminChannelId(guildId):
+        return MatchStat.adminChannelId[str(guildId)]
+
+    def setAdminChannelId(guildId, channelId):
+        MatchStat.adminChannelId[str(guildId)] = channelId
+
+    def getFlairChannelId(guildId):
+        return MatchStat.flairChannelId[str(guildId)]
+
+    def setFlairChannelId(guildId, channelId):
+        MatchStat.flairChannelId[str(guildId)] = channelId
+
+    def getFlairMessageId(guildId):
+        return MatchStat.flairMessageId[str(guildId)]
+
+    def setFlairMessageId(guildId, messageId):
+        MatchStat.flairMessageId[str(guildId)] = messageId
+
+    def getRankingRole(guildId):
+        return MatchStat.rankingRoles[str(guildId)]
+
+    def setRankingRole(guildId, rankingRole):
+        MatchStat.rankingRoles[str(guildId)] = rankingRole
+
+    def getAdminRoles(guildId):
+        return MatchStat.rankingAdminRoles[str(guildId)]
+
+    def setAdminRoles(guildId, adminRoles):
+        MatchStat.rankingAdminRoles[str(guildId)] = adminRoles
+    
+    def getRuleset(guildId):
+        return MatchStat.rulesets[str(guildId)]
+
+    def setRuleset(guildId, ruleset):
+        MatchStat.rulesets[str(guildId)] = ruleset
+
+    def initRuleset(guildId):
+        MatchStat.rulesets[str(guildId)] = Ruleset()
 
 class MatchStatus(Enum):
     CHARACTER = 0
@@ -26,106 +88,162 @@ class MatchStatus(Enum):
     END = 4
 
 class Ruleset:
-    starters = ["Battlefield", "Final Destination", "Smashville", "Pokémon Stadium 2", "Town & City"]
-    counterPicks = ["Small Battlefield", "Yoshi's Story", "Lylat Cruise", "Kalos Pokémon League"]
-    characters = {
-        "Mario": ["mario", "number1"], #1
-        "Donkey Kong": ["dk", "donkey", "donkey_kong", "donkeykong"], #2
-        "Link": ["link", "link1", "botw_link", "botwlink", "botw"], #3
-        "Samus": ["samus"], #4
-        "Dark Samus": ["dsamus", "samuse", "darksamus", "dark_samus"], #4e
-        "Yoshi": ["yoshi"], #5
-        "Kirby": ["kirby"], #6
-        "Fox": ["fox", "spacie1", "melee"], #7
-        "Pikachu": ["pika", "pikachu", "rat1", "smash64"], #8
-        "Luigi": ["luigi", "number2"], #9
-        "Ness": ["ness", "pk1"], #10
-        "Captain Falcon": ["falcon", "captain", "cap", "captainfalcon", "captain_falcon"], #11
-        "Jigglypuff": ["puff", "purin", "jigglypuff", "jigg", "jiggly"], #12
-        "Peach": ["peach", "princesspeach", "princess_peach"], #13
-        "Daisy": ["daisy", "princessdaisy", "princess_daisy", "hiimdaisy", "princess2"], #13e
-        "Bowser": ["bowser", "koopa", "kingkoopa", "king_koopa"], #14
-        "Ice Climbers": ["icies", "climbers", "iceclimbers", "ice_climbers"], #15
-        "Sheik": ["sheik"], #16
-        "Zelda": ["zelda", "princesszelda", "princess_zelda", "wisdom"], #17
-        "Dr. Mario": ["doc", "docmario", "doc_mario", "dr", "drmario", "dr_mario"], #18
-        "Pichu": ["pichu", "rat2"], #19
-        "Falco": ["falco", "spacie2"], #20
-        "Marth": ["marth", "swordie1"], #21
-        "Lucina": ["lucina", "swordie1e"], #21e
-        "Young Link": ["yink", "young", "link2", "younglink", "young_link", "ootlink", "oot_link", "oot", "courage"], #22
-        "Ganondorf": ["ganon", "ganondorf", "kingofevil", "king_of_evil", "power"], #23
-        "Mewtwo": ["mew2", "mewtwo", "m2"], #24
-        "Roy": ["roy", "roy1", "ourboy", "swordie2"], #25
-        "Chrom": ["chrom", "swordie2e"], #25e
-        "Mr. Game & Watch": ["gnw", "g&w", "gew", "gandw", "g_and_w", "gw", "gameandwatch", "game_and_watch", "mrgameandwatch", "mr_game_and_watch"], #26
-        "Meta Knight": ["metaknight", "meta_knight", "mk", "brawl"], #27
-        "Pit": ["pit"], #28
-        "Dark Pit": ["pit2", "pitoo", "dpit", "darkpit", "dark_pit", "blackpit", "black_pit"], #28e
-        "Zero Suit Samus": ["samus2", "zss", "zero", "zerosuit", "zerosuitsamus", "zero_suit", "zero_suit_samus"], #29
-        "Wario": ["wario", "waluigi", "waaaa"], #30
-        "Snake": ["snake", "solid", "solidsnake", "solid_snake"], #31
-        "Ike": ["ike", "swordie3"], #32
-        "Pokémon Trainer": ["pt", "pokemon", "pokémon", "pokemontrainer", "pokémontrainer", "pokemon_trainer", "pokémon_trainer", "squirtle", "zenigame", "ivysaur", "ivy", "fushigisou", "charizard", "zard", "zardop", "lizardon"], #33-35
-        "Diddy Kong": ["diddy", "diddykong", "diddy_kong"], #36
-        "Lucas": ["lucas", "pk2"], #37
-        "Sonic": ["sonic", "ur2slow"], #38
-        "King Dedede": ["d3", "dedede", "ddd", "kingdedede", "king_dedede", "kingddd", "king_ddd"], #39
-        "Olimar": ["olimar", "captainolimar", "captain_olimar", "alph"], #40
-        "Lucario": ["lucario"], #41
-        "R.O.B.": ["rob", "r.o.b.", "robot"], #42
-        "Toon Link": ["tink", "toon" , "link3", "toonlink", "toon_link", "ww_link", "wwlink", "ww"], #43
-        "Wolf": ["wolf", "spacie3"], #44
-        "Villager": ["villager"], #45
-        "Mega Man": ["megaman", "mm", "rock", "rockman", "mega_man", "rock_man"], #46
-        "Wii Fit Trainer": ["wft", "wii", "wiifit", "wiifittrainer", "wii_fit_trainer"], #47
-        "Rosalina & Luma": ["rosalina", "princessrosalina", "princess_rosalina", "rosa", "luma", "rosalina", "rosetta", "rosalinaluma", "rosalinanluma", "rosalina&luma", "rosalina_and_luma"], #48
-        "Little Mac": ["mac", "lilmac", "lil_mac", "littlemac", "little_mac"], #49
-        "Greninja": ["gren", "greninja", "gekkouga"], #50
-        "Mii Brawler": ["miibrawler", "mii_brawler", "brawler", "mii1"], #51
-        "Mii Swordfighter": ["miiswordfighter", "miiswordie", "mii_swordfighter", "mii_swordie", "swordfighter", "swordie", "mii2"], #52
-        "Mii Gunner": ["miigunner", "mii_gunner", "gunner", "mii3"], #53
-        "Palutena": ["palu", "palutena", "washingmachine"], #54
-        "PAC-MAN": ["pac", "pacman", "pac_man"], #55
-        "Robin": ["robin", "swordie4"], #56
-        "Shulk": ["shulk"], #57
-        "Bowser Jr.": ["bowserjr", "bowser_jr", "koopajr", "koopa_jr", "princekoopa", "prince_koopa", "ludwig", "larry", "morton", "wendy", "iggy", "roy2", "royk", "roykoopa", "roy_koopa", "lemmy"], #58
-        "Duck Hunt": ["duckhunt", "dh", "duck", "duckhuntduo", "duck_hunt_duo", "fakebanjo"], #59
-        "Ryu": ["ryu", "shoto"], #60
-        "Ken": ["ken", "shotoe"], #60e
-        "Cloud": ["cloud", "strife", "cloudstrife", "cloud_strife"], #61
-        "Corrin": ["corrin", "corn", "swordie5"], #62
-        "Bayonetta": ["bayo", "bayonetta", "sm4sh"], #63
-        "Inkling": ["inkling", "inklinggirl", "inklingboy", "inkling_girl", "inkling_boy"], #64
-        "Ridley": ["ridley"], #65
-        "Simon": ["simon", "belmont", "simonbelmont", "simon_belmont"], #66
-        "Richter": ["richter", "belmonte", "richterbelmont", "richter_belmont"], #66e
-        "King K. Rool": ["krool", "rool", "kkr", "kingkrool", "king_krool"], #67
-        "Isabelle": ["isabelle", "isa", "belle", "bell", "is_a_belle", "shizue"], #68
-        "Incineroar": ["incineroar", "incin", "gaogaen"], #69
-        "Piranha Plant": ["piranhaplant", "piranha_plant", "plant", "plantgang"], #70
-        "Joker": ["joker", "arsene", "ultimate"], #71
-        "Hero": ["hero", "luminary", "eight", "erdrick", "solo", "slotmachine", "goku", "trunks", "c17"], #72
-        "Banjo & Kazooie": ["banjo", "kazooie", "bk", "banjokazooie", "banjo&kazooie", "banjonkazooie", "banjo_kazooie", "banjo_and_kazooie", "bear_and_bird"], #73
-        "Terry": ["terry", "bogard", "terrybogard", "terry_bogard"], #74
-        "Byleth": ["byleth", "swordie6"], #75
-        "Min Min": ["minmin", "min_min"], #76
-        "Steve": ["steve", "alex", "zombie", "enderman", "ender", "herobrine", "trump"], #77
-        "Sephiroth": ["sephiroth", "seph"], #78
-        "Pyra / Mythra": ["pyra", "mythra", "pyramythra", "pyra_mythra", "pm", "aegis"], #79-80
-        "Kazuya": ["kazuya", "mishima", "kazuyamishima", "kazuya_mishima", "devil"], #81
-        "Random": ["random", "?", "idk", "jesustakethewheel"] #random
-    }
-    isDSR = False
-    isMDSR = True
-    isTSR = False
-    dsrMaxBans = 2
-    noDSRMaxBans = 3
+    def __init__(self):
+        self.stages = {
+            "Battlefield": ["bf", "battle", "battle1", "battlefield"],
+            "Final Destination": [ "fd", "final", "finaldestination", "final_destination" ],
+            "Smashville": [ "sv", "ville", "smashville" ],
+            "Pokémon Stadium 2": [ "ps2", "ps", "playstation2", "pokemonstadium2", "pokemon_stadium_2", "pokémonstadium2", "pokémon_stadium_2" ],
+            "Town & City": [ "tc", "tnc", "t&c", "townandcity", "town_and_city", "town&city" ],
+            "Small Battlefield": [ "sbf", "battle2", "smallbattlefield", "small_battlefield" ],
+            "Yoshi's Story": [ "yoshi", "yoshis", "yoshisstory", "yoshistory", "yoshis_story", "yoshi_story" ],
+            "Lylat Cruise": [ "lylat", "cruise", "lylatcruise", "lylat_cruise" ],
+            "Kalos Pokémon League": [ "kalos", "kalospokemonleague", "kalos_pokemon_league", "kalospokémonleague", "kalos_pokémon_league" ],
+            "Northern Cave": [ "nc", "northerncave", "northern_cave", "jenova" ]
+        }
+        self.starters = ["Battlefield", "Final Destination", "Smashville", "Pokémon Stadium 2", "Town & City"]
+        self.counterPicks = ["Small Battlefield", "Yoshi's Story", "Lylat Cruise", "Kalos Pokémon League"]
+        self.characters = {
+            "Mario": ["mario", "number1"], #1
+            "Donkey Kong": ["dk", "donkey", "donkey_kong", "donkeykong"], #2
+            "Link": ["link", "link1", "botw_link", "botwlink", "botw"], #3
+            "Samus": ["samus"], #4
+            "Dark Samus": ["dsamus", "samuse", "darksamus", "dark_samus"], #4e
+            "Yoshi": ["yoshi"], #5
+            "Kirby": ["kirby"], #6
+            "Fox": ["fox", "spacie1", "melee"], #7
+            "Pikachu": ["pika", "pikachu", "rat1", "smash64"], #8
+            "Luigi": ["luigi", "number2"], #9
+            "Ness": ["ness", "pk1"], #10
+            "Captain Falcon": ["falcon", "captain", "cap", "captainfalcon", "captain_falcon"], #11
+            "Jigglypuff": ["puff", "purin", "jigglypuff", "jigg", "jiggly"], #12
+            "Peach": ["peach", "princesspeach", "princess_peach"], #13
+            "Daisy": ["daisy", "princessdaisy", "princess_daisy", "hiimdaisy", "princess2"], #13e
+            "Bowser": ["bowser", "koopa", "kingkoopa", "king_koopa"], #14
+            "Ice Climbers": ["icies", "climbers", "iceclimbers", "ice_climbers"], #15
+            "Sheik": ["sheik"], #16
+            "Zelda": ["zelda", "princesszelda", "princess_zelda", "wisdom"], #17
+            "Dr. Mario": ["doc", "docmario", "doc_mario", "dr", "drmario", "dr_mario"], #18
+            "Pichu": ["pichu", "rat2"], #19
+            "Falco": ["falco", "spacie2"], #20
+            "Marth": ["marth", "swordie1"], #21
+            "Lucina": ["lucina", "swordie1e"], #21e
+            "Young Link": ["yink", "young", "link2", "younglink", "young_link", "ootlink", "oot_link", "oot", "courage"], #22
+            "Ganondorf": ["ganon", "ganondorf", "kingofevil", "king_of_evil", "power"], #23
+            "Mewtwo": ["mew2", "mewtwo", "m2"], #24
+            "Roy": ["roy", "roy1", "ourboy", "swordie2"], #25
+            "Chrom": ["chrom", "swordie2e"], #25e
+            "Mr. Game & Watch": ["gnw", "g&w", "gew", "gandw", "g_and_w", "gw", "gameandwatch", "game_and_watch", "mrgameandwatch", "mr_game_and_watch"], #26
+            "Meta Knight": ["metaknight", "meta_knight", "mk", "brawl"], #27
+            "Pit": ["pit"], #28
+            "Dark Pit": ["pit2", "pitoo", "dpit", "darkpit", "dark_pit", "blackpit", "black_pit"], #28e
+            "Zero Suit Samus": ["samus2", "zss", "zero", "zerosuit", "zerosuitsamus", "zero_suit", "zero_suit_samus"], #29
+            "Wario": ["wario", "waluigi", "waaaa"], #30
+            "Snake": ["snake", "solid", "solidsnake", "solid_snake"], #31
+            "Ike": ["ike", "swordie3"], #32
+            "Pokémon Trainer": ["pt", "pokemon", "pokémon", "pokemontrainer", "pokémontrainer", "pokemon_trainer", "pokémon_trainer", "squirtle", "zenigame", "ivysaur", "ivy", "fushigisou", "charizard", "zard", "zardop", "lizardon"], #33-35
+            "Diddy Kong": ["diddy", "diddykong", "diddy_kong"], #36
+            "Lucas": ["lucas", "pk2"], #37
+            "Sonic": ["sonic", "ur2slow"], #38
+            "King Dedede": ["d3", "dedede", "ddd", "kingdedede", "king_dedede", "kingddd", "king_ddd"], #39
+            "Olimar": ["olimar", "captainolimar", "captain_olimar", "alph"], #40
+            "Lucario": ["lucario"], #41
+            "R.O.B.": ["rob", "r.o.b.", "robot"], #42
+            "Toon Link": ["tink", "toon" , "link3", "toonlink", "toon_link", "ww_link", "wwlink", "ww"], #43
+            "Wolf": ["wolf", "spacie3"], #44
+            "Villager": ["villager"], #45
+            "Mega Man": ["megaman", "mm", "rock", "rockman", "mega_man", "rock_man"], #46
+            "Wii Fit Trainer": ["wft", "wii", "wiifit", "wiifittrainer", "wii_fit_trainer"], #47
+            "Rosalina & Luma": ["rosalina", "princessrosalina", "princess_rosalina", "rosa", "luma", "rosalina", "rosetta", "rosalinaluma", "rosalinanluma", "rosalina&luma", "rosalina_and_luma"], #48
+            "Little Mac": ["mac", "lilmac", "lil_mac", "littlemac", "little_mac"], #49
+            "Greninja": ["gren", "greninja", "gekkouga"], #50
+            "Mii Brawler": ["miibrawler", "mii_brawler", "brawler", "mii1"], #51
+            "Mii Swordfighter": ["miiswordfighter", "miiswordie", "mii_swordfighter", "mii_swordie", "swordfighter", "swordie", "mii2"], #52
+            "Mii Gunner": ["miigunner", "mii_gunner", "gunner", "mii3"], #53
+            "Palutena": ["palu", "palutena", "washingmachine"], #54
+            "PAC-MAN": ["pac", "pacman", "pac_man"], #55
+            "Robin": ["robin", "swordie4"], #56
+            "Shulk": ["shulk"], #57
+            "Bowser Jr.": ["bowserjr", "bowser_jr", "koopajr", "koopa_jr", "princekoopa", "prince_koopa", "ludwig", "larry", "morton", "wendy", "iggy", "roy2", "royk", "roykoopa", "roy_koopa", "lemmy"], #58
+            "Duck Hunt": ["duckhunt", "dh", "duck", "duckhuntduo", "duck_hunt_duo", "fakebanjo"], #59
+            "Ryu": ["ryu", "shoto"], #60
+            "Ken": ["ken", "shotoe"], #60e
+            "Cloud": ["cloud", "strife", "cloudstrife", "cloud_strife"], #61
+            "Corrin": ["corrin", "corn", "swordie5"], #62
+            "Bayonetta": ["bayo", "bayonetta", "sm4sh"], #63
+            "Inkling": ["inkling", "inklinggirl", "inklingboy", "inkling_girl", "inkling_boy"], #64
+            "Ridley": ["ridley"], #65
+            "Simon": ["simon", "belmont", "simonbelmont", "simon_belmont"], #66
+            "Richter": ["richter", "belmonte", "richterbelmont", "richter_belmont"], #66e
+            "King K. Rool": ["krool", "rool", "kkr", "kingkrool", "king_krool"], #67
+            "Isabelle": ["isabelle", "isa", "belle", "bell", "is_a_belle", "shizue"], #68
+            "Incineroar": ["incineroar", "incin", "gaogaen"], #69
+            "Piranha Plant": ["piranhaplant", "piranha_plant", "plant", "plantgang"], #70
+            "Joker": ["joker", "arsene", "ultimate"], #71
+            "Hero": ["hero", "luminary", "eight", "erdrick", "solo", "slotmachine", "goku", "trunks", "c17"], #72
+            "Banjo & Kazooie": ["banjo", "kazooie", "bk", "banjokazooie", "banjo&kazooie", "banjonkazooie", "banjo_kazooie", "banjo_and_kazooie", "bear_and_bird"], #73
+            "Terry": ["terry", "bogard", "terrybogard", "terry_bogard"], #74
+            "Byleth": ["byleth", "swordie6"], #75
+            "Min Min": ["minmin", "min_min"], #76
+            "Steve": ["steve", "alex", "zombie", "enderman", "ender", "herobrine", "trump"], #77
+            "Sephiroth": ["sephiroth", "seph"], #78
+            "Pyra / Mythra": ["pyra", "mythra", "pyramythra", "pyra_mythra", "pm", "aegis"], #79-80
+            "Kazuya": ["kazuya", "mishima", "kazuyamishima", "kazuya_mishima", "devil"], #81
+            "Random": ["random", "?", "idk", "jesustakethewheel"] #random
+        }
+        self.isDSR = False
+        self.isMDSR = True
+        self.isTSR = False
+        self.counterPickBans = 2
+
+    def getCharacterName(self, charAlias):
+        for key, value in self.characters.items():
+            for alias in value:
+                if charAlias == alias:
+                    return key
+
+        return "INVALID"
+
+    def getStageName(self, charAlias):
+        for key, value in self.stages.items():
+            for alias in value:
+                if charAlias == alias:
+                    return key
+
+        return "INVALID"
+
+    def arrangeBans(self, match):
+        if match.round == 1:
+            completeList = self.starters
+        else:
+            completeList = self.starters + self.counterPicks
+            if self.isDSR:
+                completeList = [x for x in completeList if x not in match.dsrBans]
+            elif self.isMDSR:
+                if match.winner[-1] == match.player1 and match.lastWon2:
+                    completeList.remove(match.lastWon2[-1])
+                elif match.winner[-1] == match.player2 and match.lastWon1:
+                    completeList.remove(match.lastWon1[-1])
+            elif self.isTSR:
+                if match.winner[-1] == match.player1 and match.lastWon2:
+                    for counter in self.counterPicks:
+                        if counter == match.lastWon2[-1]:
+                            completeList.remove(match.lastWon2[-1])
+                            pass
+                elif match.winner[-1] == match.player2 and match.lastWon1:
+                    for counter in self.counterPicks:
+                        if counter == match.lastWon1[-1]:
+                            completeList.remove(match.lastWon1[-1])
+                            pass
+
+        return [x for x in completeList if x not in match.bans]
 
 class ScrapMatch:
     def __init__(self, player1, player2):
-        self.player1 = player1
-        self.player2 = player2
+        if self.player1.guildId == self.player2.guildId:
+            self.player1 = player1
+            self.player2 = player2
+            self.guildId = self.player1.guildId
 
 class Match:
     def __init__(self, message, guild, player1, player2, chooser, isBo5, promotion):
@@ -147,22 +265,23 @@ class Match:
         self.isBo5 = isBo5
         self.bans = []
         self.dsrBans = []
-        self.lastWon1 = ""
-        self.lastWon2 = ""
+        self.lastWon1 = []
+        self.lastWon2 = []
         self.promotion = promotion
 
     def incrementScore(self):
-        if Ruleset.isDSR:
+        ruleset = MatchStat.getRuleset(self.guild)
+        if ruleset.isDSR:
             self.dsrBans.append(self.bans[0])
 
         if self.winner[-1] == self.player1:
             self.score1 += 1
-            if Ruleset.isMDSR or Ruleset.isTSR:
-                self.lastWon1 = self.bans[0]
+            if (ruleset.isMDSR or ruleset.isTSR) and self.bans:
+                self.lastWon1.append(self.bans[0])
         elif self.winner[-1] == self.player2:
             self.score2 += 1
-            if Ruleset.isMDSR or Ruleset.isTSR:
-                self.lastWon2 = self.bans[0]
+            if (ruleset.isMDSR or ruleset.isTSR) and self.bans:
+                self.lastWon2.append(self.bans[0])
         
         self.chooser = self.winner[-1]
         if (self.isBo5 and (self.score1 == 3 or self.score2 == 3)) or (self.score1 == 2 or self.score2 == 2):
@@ -191,38 +310,72 @@ class Match:
         self.winner = []
         self.tie = True
 
-def ready():
-    MatchStat.queueChannelId = 865882258636406804
-    MatchStat.matchChannelId = 865882224553623552
+    def reset(self):
+        self.round -= 1
+        if self.winner[-1] == self.player1:
+            self.score1 -= 1
+            self.lastWon1.pop()
+        elif self.winner[-1] == self.player2:
+            self.score2 -= 1
+            self.lastWon2.pop()
+        self.winner.pop()
+        self.chooser = self.winner[-1]
+        self.status = MatchStatus.STRIKING
+
+def ready(guildId, messageId):
+    initServer(guildId, queueChannelId=865882258636406804, matchChannelId=865882224553623552, adminChannelId=867024058175979550, flairChannelId=865593981164847115, flairMessageId=messageId)
+
+def initServer(guildId, rankingRole="Ranking1v1", adminRankingRoles=["RankingStaff"], queueChannelId=0, matchChannelId=0, adminChannelId=0, flairChannelId=0, flairMessageId=0):
+    MatchStat.setRankingRole(guildId, rankingRole)
+    MatchStat.setAdminRoles(guildId, adminRankingRoles)
+    
+    MatchStat.setQueueChannelId(guildId, queueChannelId)
+    MatchStat.setMatchChannelId(guildId, matchChannelId)
+
+    MatchStat.setAdminChannelId(guildId, adminChannelId)
+
+    MatchStat.setFlairChannelId(guildId, flairChannelId)
+    MatchStat.setFlairMessageId(guildId, flairMessageId)
+
+    MatchStat.initRuleset(guildId)
+
 
 async def getRankingRole(guild):
-    myRole = discord.utils.get(guild.roles,name="Ranking1v1")
-    if myRole is None:
-        await guild.create_role(name="Ranking1v1", colour=discord.Colour(0xff5555))
-        myRole = discord.utils.get(guild.roles,name="Ranking1v1")
-    
+    myRoleName = MatchStat.getRankingRole(guild.id)
+    myRole = discord.utils.get(guild.roles, name=myRoleName)    
     return myRole
+
+async def getAdminRankingRoles(guild):
+    myRoles = MatchStat.getAdminRoles(guild.id)
+    returnRoles = []
+    if myRoles:
+        for myRoleName in myRoles:
+            myRole = discord.utils.get(guild.roles, name=myRoleName)
+            if myRole is not None:
+                returnRoles.append(myRole)
+    
+    return returnRoles
 
 async def queue(client, strMsg):
     flag = checkUserInQueue(strMsg)
     if flag:
-        queueChannelId = client.get_channel(MatchStat.queueChannelId)
+        queueChannelId = client.get_channel(MatchStat.queueChannelId[strMsg.guild.id])
         await queueChannelId.send("<@" + str(strMsg.author.id) + ">, you are already in waiting queue, please wait for your opponent!")
         return
 
     flag = checkExistingMatch(strMsg)
     if flag:
-        queueChannelId = client.get_channel(MatchStat.queueChannelId)
+        queueChannelId = client.get_channel(MatchStat.queueChannelId[strMsg.guild.id])
         await queueChannelId.send("<@" + str(strMsg.author.id) + ">, you are already in a match, please finish your match!")
     else:
-        queueChannelId = client.get_channel(MatchStat.queueChannelId)
+        queueChannelId = client.get_channel(MatchStat.queueChannelId[strMsg.guild.id])
         await queueChannelId.send("<@" + str(strMsg.author.id) + ">, you have been added to the queue, waiting for opponent...")
         global waitingQueue
-        queuedPlayer = QueuedPlayer(strMsg.author.id)
+        queuedPlayer = QueuedPlayer(strMsg.author.id, strMsg.guild.id)
         waitingQueue.append(queuedPlayer)
 
 async def unqueue(client, strMsg):
-    queueChannelId = client.get_channel(MatchStat.queueChannelId)
+    queueChannelId = client.get_channel(MatchStat.queueChannelId[strMsg.guild.id])
     flag = checkExistingMatch(strMsg)
     if flag:
         await queueChannelId.send("<@" + str(strMsg.author.id) + ">, you are already in a match, please finish your match!")
@@ -231,7 +384,7 @@ async def unqueue(client, strMsg):
     flag = False
     if waitingQueue:
         for user in waitingQueue:
-            if user.userId == strMsg.author.id:
+            if user.userId == strMsg.author.id and user.guildId == strMsg.guild.id:
                 await queueChannelId.send("<@" + str(strMsg.author.id) + ">, you have been removed from the queue by request!")
                 waitingQueue.remove(user)
                 flag = True
@@ -251,7 +404,7 @@ async def searchForMatch(client):
             scrapMatches = await try_match(client)
             if scrapMatches:
                 for scrapMatch in scrapMatches:
-                    await sendMessage(client, player1=scrapMatch.player1.userId, player2=scrapMatch.player2.userId)
+                    await sendMessage(client, guild=scrapMatch.guildId, player1=scrapMatch.player1.userId, player2=scrapMatch.player2.userId)
 
                     waitingQueue.remove(scrapMatch.player1)
                     waitingQueue.remove(scrapMatch.player2)
@@ -274,13 +427,16 @@ async def try_match(client):
 
 async def removeFromQueue(client, queuedPlayer):
     global waitingQueue
-    queueChannelId = client.get_channel(MatchStat.queueChannelId)
+    queueChannelId = client.get_channel(MatchStat.queueChannelId[queuedPlayer.guildId])
     await queueChannelId.send("<@" + str(queuedPlayer.userId) + ">, we couldn't find you an opponent for ranked and you have been removed from the queue, please try again later.")
     waitingQueue.remove(queuedPlayer)
 
 
-async def sendMessage(client, match=None, player1=0, player2=0):
-    matchChannelId = client.get_channel(MatchStat.matchChannelId)
+async def sendMessage(client, match=None, guildId=0, player1=0, player2=0):
+    if match is not None and guildId == 0:
+        guildId = match.guild
+
+    matchChannelId = client.get_channel(MatchStat.matchChannelId[guildId])
 
     if match is None:
         title = "Round 1!"
@@ -290,6 +446,7 @@ async def sendMessage(client, match=None, player1=0, player2=0):
         mainMessage = "Get ready for the next battle! \n"
     else:
         title = "Round " + str(match.round) + "!"
+        ruleset = MatchStat.getRuleset(match.guild)
         if match.status == MatchStatus.CHARACTER:
             if match.round == 1: 
                 description = "<@" + str(match.player1) + "> vs. <@"+ str(match.player2) +">! Check your DMs to pick your character!"
@@ -308,23 +465,18 @@ async def sendMessage(client, match=None, player1=0, player2=0):
                     description = "<@"+str(match.chooser)+"> ban your next stage!"
             else:
                 count = len(match.bans)
-                if Ruleset.isDSR or Ruleset.isMDSR or Ruleset.isTSR:
-                    maxBans = Ruleset.dsrMaxBans
-                else:
-                    maxBans = Ruleset.noDSRMaxBans
-
-                if count == maxBans:
+                if count == ruleset.counterPickBans:
                     description = "<@"+str(match.chooser)+"> pick your stage!"
                 else:
                     description = "<@"+str(match.chooser)+"> ban your next stage!"
 
-            listOfBans = arrangeBans(match)
+            listOfBans = ruleset.arrangeBans(match)
             fields = arrangeBanFields(listOfBans)
             mainMessage = "Striking phase! \n"
         elif match.status == MatchStatus.PLAYING:
             mainMessage = "Face-off! \n"
-            listOfBans = arrangeBans(match)
-            description = "Now playing on: **" + listOfBans[0] + "** \n At the end of your round, <@" + str(match.chooser) + "> please report the result and your opponent will verify it afterwards."
+            listOfBans = ruleset.arrangeBans(match)
+            description = "Now playing on: **" + listOfBans[0] + "** \nAt the end of your round, <@" + str(match.chooser) + "> please report the result and your opponent will verify it afterwards."
             fields = arrangePlayFields(client, match)
         elif match.status == MatchStatus.RESULTS:
             if match.chooser == match.player1:
@@ -350,18 +502,18 @@ async def sendMessage(client, match=None, player1=0, player2=0):
                     loser = match.player1
 
                 mainMessage = "<@" + str(winner) + "> is the winner of this set! Congratulations! GGs! \n"
-                if match.forfeit:
+                if match.surrendered:
                     description = "Not like this, <@" + str(loser) + ">..."
                 else:
                     description = "Better luck next time <@" + str(loser) + ">! Don't be salty and shake your opponent's hand!"
             fields = []
 
     if match is None:
-        mainMessageSuffix = "**<@" + str(player1) + ">** vs. **<@"+ str(player2) +">** \n **Score**: 0 - 0"
+        mainMessageSuffix = "**<@" + str(player1) + ">** vs. **<@"+ str(player2) +">** \n**Score**: 0 - 0"
     else:
         if match.status == MatchStatus.END:
             if match.tie:
-                mainMessageSuffix = "**<@" + str(match.player1) + ">** vs. **<@"+ str(match.player2) +">** \n **Score**: TIE"
+                mainMessageSuffix = "**<@" + str(match.player1) + ">** vs. **<@"+ str(match.player2) +">** \n**Score**: TIE"
             elif match.surrendered:
                 if match.score1 == -1:
                     score1 = "DQ"
@@ -369,16 +521,16 @@ async def sendMessage(client, match=None, player1=0, player2=0):
                 elif match.score2 == -1:
                     score1 = "W"
                     score2 = "DQ"
-                mainMessageSuffix = "**<@" + str(match.player1) + ">** vs. **<@"+ str(match.player2) +">** \n **Score**: " + score1 + " - " + score2
+                mainMessageSuffix = "**<@" + str(match.player1) + ">** vs. **<@"+ str(match.player2) +">** \n**Score**: " + score1 + " - " + score2
             else:
                 characters1 = buildCharacterList(match.player1chars)
                 characters2 = buildCharacterList(match.player2chars)
-                mainMessageSuffix = "**<@" + str(match.player1) + ">** *(" + characters1 + ")* vs. **<@"+ str(match.player2) +">** *(" + characters2 + ")* \n **Score**: " + str(match.score1) + " - " + str(match.score2)
+                mainMessageSuffix = "**<@" + str(match.player1) + ">** *(" + characters1 + ")* vs. **<@"+ str(match.player2) +">** *(" + characters2 + ")* \n**Score**: " + str(match.score1) + " - " + str(match.score2)
 
         elif match.player1chars and match.player2chars and len(match.player1chars) == match.round and len(match.player2chars) == match.round:
-            mainMessageSuffix = "**<@" + str(match.player1) + ">** *(" + match.player1chars[match.round - 1] + ")* vs. **<@"+ str(match.player2) +">** *(" + match.player2chars[match.round - 1] + ")* \n **Score**: " + str(match.score1) + " - " + str(match.score2)
+            mainMessageSuffix = "**<@" + str(match.player1) + ">** *(" + match.player1chars[match.round - 1] + ")* vs. **<@"+ str(match.player2) +">** *(" + match.player2chars[match.round - 1] + ")* \n**Score**: " + str(match.score1) + " - " + str(match.score2)
         else:
-            mainMessageSuffix = "**<@" + str(match.player1) + ">** vs. **<@"+ str(match.player2) +">** \n **Score**: " + str(match.score1) + " - " + str(match.score2)
+            mainMessageSuffix = "**<@" + str(match.player1) + ">** vs. **<@"+ str(match.player2) +">** \n**Score**: " + str(match.score1) + " - " + str(match.score2)
 
     mainMessage += mainMessageSuffix
 
@@ -409,9 +561,9 @@ async def sendMessage(client, match=None, player1=0, player2=0):
     return message
 
 async def sendTieOrForfeitMessage(client, match):
-    matchChannelId = client.get_channel(MatchStat.matchChannelId)
-    embed = discord.Embed(title="Tie or Forfeit?", description="Both players need to agree on tie! \n Only one player can forfeit.")
-    mainMessage = "Tie or Forfeit? \n **<@" + str(match.player1) + ">** vs. **<@"+ str(match.player2) +">**"
+    matchChannelId = client.get_channel(MatchStat.matchChannelId[match.guild])
+    embed = discord.Embed(title="Tie or Forfeit?", description="Both players need to agree on tie! \nOnly one player can forfeit.")
+    mainMessage = "Tie or Forfeit? \n**<@" + str(match.player1) + ">** vs. **<@"+ str(match.player2) +">**"
     message = await matchChannelId.send(mainMessage, embed=embed)
     await add_tie_or_forfeit_reaction(message)
     return message
@@ -434,7 +586,7 @@ def choosePlayer(player1, player2):
 
 async def sendMessageToUser(client, player, char=""):
     user = client.get_user(player)
-    embed = discord.Embed(title="Example:", description="!char donkeykong \n !char dk \n !char donkey_kong")
+    embed = discord.Embed(title="Example:", description="!char donkeykong \n!char dk \n!char donkey_kong")
     await user.send("Choose your character by sending the command **!char** *[name_or_alias_of_your_character_here]*", embed=embed)
     if char != "":
         await user.send("Your opponent chose: **" + char + "**")
@@ -463,7 +615,8 @@ async def validateChar(client, message):
         await user.send("Wrong input, please try again!")
         await sendMessageToUser(client, userId)
     else:
-        char = getCharacterName(parts[1])
+        ruleset = MatchStat.getRuleset(match.guild)
+        char = ruleset.getCharacterName(parts[1])
         if char == "INVALID":
             await user.send("Wrong input, please try again!")
             await sendMessageToUser(client, userId)
@@ -488,29 +641,29 @@ async def validateChar(client, message):
                 else:
                     match.status = MatchStatus.PLAYING
 
+                await resendMessage(client, match)
+
             await user.send("You've selected: **" + char + "**")
 
-            channel = client.get_channel(MatchStat.matchChannelId)
-            message = await channel.fetch_message(match.message)
-            oldmessage = message.id
-            messages = [message]
-            await channel.delete_messages(messages)
-            message = await sendMessage(client, match)
-            match.message = message.id
+async def resendMessage(client, match):
+    channel = client.get_channel(MatchStat.matchChannelId[match.guild])
+    message = await channel.fetch_message(match.message)
+    oldForfeitMessage = await channel.fetch_message(match.forfeitMessage)
+    oldmessage = message.id
+    messages = [message, oldForfeitMessage]
+    await channel.delete_messages(messages)
+    message = await sendMessage(client, match)
+    match.message = message.id
+    if match.status != MatchStatus.END:
+        forfeitMessage = await sendTieOrForfeitMessage(client, match)
+        match.forfeitMessage = forfeitMessage.id
+    else:
+        match.forfeitMessage = 0
 
-            replace(match, lambda x: x.message == oldmessage)
-            
-
-def getCharacterName(charAlias):
-    for key, value in Ruleset.characters.items():
-        for alias in value:
-            if charAlias == alias:
-                return key
-
-    return "INVALID"
+    replace(match, lambda x: x.message == oldmessage)
 
 def checkExistingMatch(message):
-    if contains(lambda x: x.player1 == message.author.id or x.player2 == message.author.id):       
+    if contains(lambda x: (x.player1 == message.author.id or x.player2 == message.author.id) and x.guild == message.guild.id):       
         return True
 
     return False
@@ -519,20 +672,29 @@ def checkUserInQueue(message):
     global waitingQueue
     if waitingQueue:
         for user in waitingQueue:
-            if user.userId == message.author.id:
+            if user.userId == message.author.id and user.guildId == message.guild.id:
                 return True
 
     return False
 
 async def getValidMatch(payload):
-    if payload.channel_id != MatchStat.matchChannelId:       
+    if payload.channel_id != MatchStat.matchChannelId[payload.guild_id]:       
         return None
-    if not contains(lambda x: x.player1 == payload.user_id or x.player2 == payload.user_id):       
+    if not contains(lambda x: (x.player1 == payload.user_id or x.player2 == payload.user_id) and x.guild == payload.guild_id):       
         return None
-    match = get(lambda x: x.player1 == payload.user_id or x.player2 == payload.user_id)
+    match = get(lambda x: (x.player1 == payload.user_id or x.player2 == payload.user_id) and x.guild == payload.guild_id)
     if match is None:
         return None
     if payload.message_id != match.message and payload.message_id != match.forfeitMessage:       
+        return None
+    
+    return match
+
+async def getValidMatchAdmin(playerId, guildId):
+    if not contains(lambda x: (x.player1 == playerId or x.player2 == playerId) and x.guild == guildId):       
+        return None
+    match = get(lambda x: (x.player1 == playerId or x.player2 == playerId) and x.guild == guildId)
+    if match is None:
         return None
     
     return match
@@ -541,12 +703,9 @@ async def tieOrForfeit(client, payload, match):
     flag = False
     if payload.emoji.name == "🏳️":
         flag = True
-        if payload.user_id == match.player1:
-            match.forfeit(match.player1)
-        elif payload.user_id == match.player2:
-            match.forfeit(match.player2)
+        match.forfeit(payload.user_id)
     elif payload.emoji.name == "🤝":
-        channel = client.get_channel(MatchStat.matchChannelId)
+        channel = client.get_channel(MatchStat.matchChannelId[match.guild_id])
         message = await channel.fetch_message(match.forfeitMessage)
         if message.reactions:
             for reaction in message.reactions:
@@ -559,16 +718,7 @@ async def tieOrForfeit(client, payload, match):
                     pass
 
     if flag:
-        channel = client.get_channel(MatchStat.matchChannelId)
-        message = await channel.fetch_message(match.message)
-        forfeitMessage = await channel.fetch_message(match.forfeitMessage)
-        oldmessage = message.id
-        messages = [message, forfeitMessage]
-        await channel.delete_messages(messages)
-        message = await sendMessage(client, match)
-        match.message = message.id
-
-        replace(match, lambda x: x.message == oldmessage)
+        await resendMessage(client, match)
 
 async def stageStriking(client, payload, match):
     text = getText(payload.emoji.name)
@@ -602,15 +752,7 @@ async def stageStriking(client, payload, match):
                 match.status = MatchStatus.CHARACTER
                 await sendMessageToUser(client, match.chooser)
 
-        channel = client.get_channel(MatchStat.matchChannelId)
-        message = await channel.fetch_message(match.message)
-        oldmessage = message.id
-        messages = [message]
-        await channel.delete_messages(messages)
-        message = await sendMessage(client, match)
-        match.message = message.id
-
-        replace(match, lambda x: x.message == oldmessage)
+        await resendMessage(client, match)
 
 async def victoryDecision(client, payload, match):
     flag = False
@@ -624,15 +766,7 @@ async def victoryDecision(client, payload, match):
     if flag:
         match.status = MatchStatus.RESULTS
 
-        channel = client.get_channel(MatchStat.matchChannelId)
-        message = await channel.fetch_message(match.message)
-        oldmessage = message.id
-        messages = [message]
-        await channel.delete_messages(messages)
-        message = await sendMessage(client, match)
-        match.message = message.id
-
-        replace(match, lambda x: x.message == oldmessage)
+        await resendMessage(client, match)
 
 async def victoryConfirm(client, payload, match):
     flag = False
@@ -651,46 +785,7 @@ async def victoryConfirm(client, payload, match):
             match.winner.pop()
             match.status = MatchStatus.PLAYING
 
-        channel = client.get_channel(MatchStat.matchChannelId)
-        message = await channel.fetch_message(match.message)
-        oldmessage = message.id
-        if match.Status == MatchStatus.END:
-            forfeitMessage = await channel.fetch_message(match.forfeitMessage)
-            messages = [message, forfeitMessage]
-        else:
-            messages = [message]
-        await channel.delete_messages(messages)
-        message = await sendMessage(client, match)
-        match.message = message.id
-
-        replace(match, lambda x: x.message == oldmessage)
-
-def arrangeBans(match):
-    if match.round == 1:
-        completeList = Ruleset.starters
-    else:
-        completeList = Ruleset.starters + Ruleset.counterPicks
-
-    if Ruleset.isDSR:
-        completeList = [x for x in completeList if x not in match.dsrBans]
-    elif Ruleset.isMDSR:
-        if match.winner[-1] == match.player1 and match.lastWon2 != "":
-            completeList.remove(match.lastWon2)
-        elif match.winner[-1] == match.player2 and match.lastWon1 != "":
-            completeList.remove(match.lastWon1)
-    elif Ruleset.isTSR:
-        if match.winner[-1] == match.player1 and match.lastWon2 != "":
-            for counter in Ruleset.counterPicks:
-                if counter == match.lastWon2:
-                    completeList.remove(match.lastWon2)
-                    pass
-        elif match.winner[-1] == match.player2 and match.lastWon1 != "":
-            for counter in Ruleset.counterPicks:
-                if counter == match.lastWon1:
-                    completeList.remove(match.lastWon1)
-                    pass
-
-    return [x for x in completeList if x not in match.bans]
+        await resendMessage(client, match)
 
 def arrangeBanFields(listOfBans):   
     fields = []
@@ -791,3 +886,244 @@ def getText(emote):
     elif emote == "9️⃣":
         text = "Kalos Pokémon League"
     return text
+
+# ADMIN COMMANDS
+
+async def adminCancelSet(client, match):
+    match.tieScore()
+    await resendMessage(client, match)
+
+async def adminDQPlayerFromSet(client, match, player):
+    match.forfeit(player)
+    await resendMessage(client, match)
+
+async def adminIncrementScore(client, match, player):
+    match.winner.append(player)
+    match.incrementScore()
+    await resendMessage(client, match)
+
+async def adminResetSet(client, guildId, match):
+    player1 = match.player1
+    player2 = match.player2
+    global listOfMatches
+    listOfMatches.remove(match)
+    await sendMessage(client, guilld=guildId, player1=player1, player2=player2)
+
+async def adminResetMatch(client, guildId, match):
+    if match.round == 1 or match.round - 1 == 1:
+        await adminResetSet(client, guildId, match)
+    else:
+        match.reset()
+        await resendMessage(client, match)
+
+async def adminRemoveFromQueue(client, strMsg, player, guild):
+    global waitingQueue
+    if waitingQueue:
+        for user in waitingQueue:
+            if user.userId == player and user.guildId == guild:
+                queueChannelId = client.get_channel(MatchStat.queueChannelId[strMsg.guild.id])
+                await queueChannelId.send("<@" + str(player) + ">, you have been removed from the queue by the admin!")
+                waitingQueue.remove(user)
+                return True
+    return False
+
+async def adminClearQueue(client, guild):
+    global waitingQueue
+    if waitingQueue:
+        for user in waitingQueue:
+            if user.guildId == guild:
+                queueChannelId = client.get_channel(MatchStat.queueChannelId[user.guildId])
+                await queueChannelId.send("<@" + str(user.userId) + ">, you have been removed from the queue by the admin!")
+                waitingQueue.remove(user)
+
+def adminInitServer(guildId, adminChannelId):
+    initServer(guildId, adminChannelId=adminChannelId)
+
+async def adminAddStarter(guildId, channel, message):
+    text = message.content.lower()
+    parts = text.split(" ", 1)
+    flag = True
+    if len(parts) == 2:
+        ruleset = MatchStat.getRuleset(guildId)
+        stage = ruleset.getStageName(parts[1])
+        if stage != "INVALID":
+            for starter in ruleset.starters:
+                if stage == starter:
+                    flag = False
+                    pass
+
+            if flag:
+                for counterpick in ruleset.counterPicks:
+                    if stage == counterpick:
+                        flag = False
+                        pass
+
+    if not flag:
+        await channel.send("<@" + str(message.author.id) + ">, invalid input or stage already added to the list!")
+    else:
+        ruleset.starters.append(stage)
+        MatchStat.setRuleset(guildId, ruleset)
+        await channel.send("<@" + str(message.author.id) + ">, stage added to starters: " + stage + "!")
+
+async def adminRemoveStarter(guildId, channel, message):
+    text = message.content.lower()
+    parts = text.split(" ", 1)
+    flag = False
+    if len(parts) == 2:
+        ruleset = MatchStat.getRuleset(guildId)
+        stage = ruleset.getStageName(parts[1])
+        if stage != "INVALID":
+            for starter in ruleset.starters:
+                if stage == starter:
+                    flag = True
+                    pass
+
+    if not flag:
+        await channel.send("<@" + str(message.author.id) + ">, invalid input or stage not in starters!")
+    else:
+        ruleset.starters.remove(stage)
+        MatchStat.setRuleset(guildId, ruleset)
+        await channel.send("<@" + str(message.author.id) + ">, stage removed from starters: " + stage + "!")
+
+async def adminAddCP(guildId, channel, message):
+    text = message.content.lower()
+    parts = text.split(" ", 1)
+    flag = False
+    if len(parts) == 2:
+        ruleset = MatchStat.getRuleset(guildId)
+        stage = ruleset.getStageName(parts[1])
+        if stage != "INVALID":
+            for counterpick in ruleset.counterPicks:
+                if stage == counterpick:
+                    flag = False
+                    pass
+
+            if flag:
+                for starter in ruleset.starters:
+                    if stage == starter:
+                        flag = False
+                        pass
+
+    if not flag:
+        await channel.send("<@" + str(message.author.id) + ">, invalid input or stage already added to the list!")
+    else:
+        ruleset.counterPicks.append(stage)
+        MatchStat.setRuleset(guildId, ruleset)
+        await channel.send("<@" + str(message.author.id) + ">, stage added to counter-picks: " + stage + "!")
+
+async def adminRemoveCP(guildId, channel, message):
+    text = message.content.lower()
+    parts = text.split(" ", 1)
+    flag = False
+    if len(parts) == 2:
+        ruleset = MatchStat.getRuleset(guildId)
+        stage = ruleset.getStageName(parts[1])
+        if stage != "INVALID":
+            for counterpick in ruleset.counterPicks:
+                if stage == counterpick:
+                    flag = True
+                    pass
+
+    if not flag:
+        await channel.send("<@" + str(message.author.id) + ">, invalid input or stage not in counter-picks!")
+    else:
+        ruleset.counterPicks.remove(stage)
+        MatchStat.setRuleset(guildId, ruleset)
+        await channel.send("<@" + str(message.author.id) + ">, stage removed from counter-picks: " + stage + "!")
+
+def adminSetDSR(guildId):
+    ruleset = MatchStat.getRuleset(guildId)
+    ruleset.isDSR = True
+    ruleset.isMDSR = False
+    ruleset.isTSR = False
+    MatchStat.setRuleset(guildId, ruleset)
+
+def adminSetMDSR(guildId):
+    ruleset = MatchStat.getRuleset(guildId)
+    ruleset.isDSR = False
+    ruleset.isMDSR = True
+    ruleset.isTSR = False
+    MatchStat.setRuleset(guildId, ruleset)
+
+def adminSetTSR(guildId):
+    ruleset = MatchStat.getRuleset(guildId)
+    ruleset.isDSR = False
+    ruleset.isMDSR = False
+    ruleset.isTSR = True
+    MatchStat.setRuleset(guildId, ruleset)
+
+def adminSetNoDSR(guildId):
+    ruleset = MatchStat.getRuleset(guildId)
+    ruleset.isDSR = False
+    ruleset.isMDSR = False
+    ruleset.isTSR = False
+    MatchStat.setRuleset(guildId, ruleset)
+
+async def adminSetCounterPickBanCount(guildId, channel, message):
+    parts = message.content.split(" ", 1)
+    if len(parts) != 2:
+        await channel.send("<@" + str(message.author.id) + ">, invalid input!")
+    else:
+        count = 0
+        flag = True
+        try:
+            count = (int)(parts[1])
+        except ValueError:
+            flag = False
+
+        if flag:
+            ruleset = MatchStat.getRuleset(guildId)
+            if count <= 0 or count > 3:
+                flag = False
+            else:
+                ruleset.counterPickBans = count
+                MatchStat.setRuleset(guildId, ruleset)
+
+        if flag:
+            await channel.send("<@" + str(message.author.id) + ">, the ruleset has set " + count + " winner bans in Round 2+!")
+        else:
+            await channel.send("<@" + str(message.author.id) + ">, invalid number of bans!")
+
+def adminAddStaffRole(client, guildId, roleId):
+    role = getRole(client, guildId, roleId)
+    adminRoles = MatchStat.getAdminRoles(guildId)
+    flag = True
+    if adminRoles:
+        for adminRole in adminRoles:
+            if role.name == adminRole:
+                flag == False
+                pass
+    if flag:
+        adminRoles.append(role.name)
+        MatchStat.setAdminRoles(guildId, adminRoles)
+
+    return flag
+
+def adminRemoveStaffRole(client, guildId, roleId):
+    role = getRole(client, guildId, roleId)
+    adminRoles = MatchStat.getAdminRoles(guildId)
+    flag = False
+    if adminRoles:
+        for adminRole in adminRoles:
+            if role.name == adminRole:
+                adminRoles.remove(adminRole)
+                flag == True
+    if flag:
+        MatchStat.setAdminRoles(guildId, adminRoles)
+
+    return flag
+
+def adminSetRankingRole(client, guildId, roleId):
+    role = getRole(client, guildId, roleId)
+    MatchStat.setRankingRole(guildId, role.name)
+    
+def getRole(client, guildId, roleId):
+    guild = client.get_guild(guildId)
+    role = guild.get_role(roleId)
+    return role
+
+def adminSetQueueChannel(guildId, channelId):
+    MatchStat.setQueueChannelId(guildId, channelId)
+
+def adminSetMatchChannel(guildId, channelId):
+    MatchStat.setMatchChannelId(guildId, channelId)
