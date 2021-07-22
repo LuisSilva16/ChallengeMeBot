@@ -15,7 +15,9 @@ class QueuedPlayer:
         self.guildId = guildId
         self.expiration = datetime.utcnow() + timedelta(minutes=30)
 
-class MatchStat:
+class GuildSettings:
+    isMultiChannelMode = {}
+
     queueChannelId = {}
     matchChannelId = {}
     
@@ -29,80 +31,89 @@ class MatchStat:
 
     rulesets = {}
 
-    def getQueueChannelId(guildId):
-        if not str(guildId) in MatchStat.queueChannelId:
-            MatchStat.queueChannelId[str(guildId)] = 0
+    def getIsMultiChannelMode(guildId):
+        if not str(guildId) in GuildSettings.isMultiChannelMode:
+            GuildSettings.isMultiChannelMode[str(guildId)] = False
 
-        return MatchStat.queueChannelId[str(guildId)]
+        return GuildSettings.isMultiChannelMode[str(guildId)]
+
+    def setIsMultiChannelMode(guildId, flag):
+        GuildSettings.isMultiChannelMode[str(guildId)] = flag
+
+    def getQueueChannelId(guildId):
+        if not str(guildId) in GuildSettings.queueChannelId:
+            GuildSettings.queueChannelId[str(guildId)] = 0
+
+        return GuildSettings.queueChannelId[str(guildId)]
 
     def setQueueChannelId(guildId, channelId):
-        MatchStat.queueChannelId[str(guildId)] = channelId
+        GuildSettings.queueChannelId[str(guildId)] = channelId
 
     def getMatchChannelId(guildId):
-        if not str(guildId) in MatchStat.matchChannelId:
-            MatchStat.matchChannelId[str(guildId)] = 0
+        if not str(guildId) in GuildSettings.matchChannelId:
+            GuildSettings.matchChannelId[str(guildId)] = 0
 
-        return MatchStat.matchChannelId[str(guildId)]
+        return GuildSettings.matchChannelId[str(guildId)]
 
     def setMatchChannelId(guildId, channelId):
-        MatchStat.matchChannelId[str(guildId)] = channelId
+        GuildSettings.matchChannelId[str(guildId)] = channelId
 
     def getAdminChannelId(guildId):
-        if not str(guildId) in MatchStat.adminChannelId:
-            MatchStat.adminChannelId[str(guildId)] = 0
+        if not str(guildId) in GuildSettings.adminChannelId:
+            GuildSettings.adminChannelId[str(guildId)] = 0
 
-        return MatchStat.adminChannelId[str(guildId)]
+        return GuildSettings.adminChannelId[str(guildId)]
 
     def setAdminChannelId(guildId, channelId):
-        MatchStat.adminChannelId[str(guildId)] = channelId
+        GuildSettings.adminChannelId[str(guildId)] = channelId
 
     def getFlairChannelId(guildId):
-        if not str(guildId) in MatchStat.flairChannelId:
-            MatchStat.flairChannelId[str(guildId)] = 0
+        if not str(guildId) in GuildSettings.flairChannelId:
+            GuildSettings.flairChannelId[str(guildId)] = 0
 
-        return MatchStat.flairChannelId[str(guildId)]
+        return GuildSettings.flairChannelId[str(guildId)]
 
     def setFlairChannelId(guildId, channelId):
-        MatchStat.flairChannelId[str(guildId)] = channelId
+        GuildSettings.flairChannelId[str(guildId)] = channelId
 
     def getFlairMessageId(guildId):
-        if not str(guildId) in MatchStat.flairMessageId:
-            MatchStat.flairMessageId[str(guildId)] = 0
+        if not str(guildId) in GuildSettings.flairMessageId:
+            GuildSettings.flairMessageId[str(guildId)] = 0
 
-        return MatchStat.flairMessageId[str(guildId)]
+        return GuildSettings.flairMessageId[str(guildId)]
 
     def setFlairMessageId(guildId, messageId):
-        MatchStat.flairMessageId[str(guildId)] = messageId
+        GuildSettings.flairMessageId[str(guildId)] = messageId
 
     def getRankingRole(guildId):
-        if not str(guildId) in MatchStat.rankingRoles:
-            MatchStat.rankingRoles[str(guildId)] = "Ranking1v1"
+        if not str(guildId) in GuildSettings.rankingRoles:
+            GuildSettings.rankingRoles[str(guildId)] = "Ranking1v1"
 
-        return MatchStat.rankingRoles[str(guildId)]
+        return GuildSettings.rankingRoles[str(guildId)]
 
     def setRankingRole(guildId, rankingRole):
-        MatchStat.rankingRoles[str(guildId)] = rankingRole
+        GuildSettings.rankingRoles[str(guildId)] = rankingRole
 
     def getAdminRoles(guildId):
-        if not str(guildId) in MatchStat.rankingAdminRoles:
-            MatchStat.rankingAdminRoles[str(guildId)] = ["RankingStaff"]
+        if not str(guildId) in GuildSettings.rankingAdminRoles:
+            GuildSettings.rankingAdminRoles[str(guildId)] = ["RankingStaff"]
 
-        return MatchStat.rankingAdminRoles[str(guildId)]
+        return GuildSettings.rankingAdminRoles[str(guildId)]
 
     def setAdminRoles(guildId, adminRoles):
-        MatchStat.rankingAdminRoles[str(guildId)] = adminRoles
+        GuildSettings.rankingAdminRoles[str(guildId)] = adminRoles
     
     def getRuleset(guildId):
-        if not str(guildId) in MatchStat.rulesets:
-            MatchStat.rulesets[str(guildId)] = Ruleset()
+        if not str(guildId) in GuildSettings.rulesets:
+            GuildSettings.rulesets[str(guildId)] = Ruleset()
 
-        return MatchStat.rulesets[str(guildId)]
+        return GuildSettings.rulesets[str(guildId)]
 
     def setRuleset(guildId, ruleset):
-        MatchStat.rulesets[str(guildId)] = ruleset
+        GuildSettings.rulesets[str(guildId)] = ruleset
 
     def initRuleset(guildId):
-        MatchStat.rulesets[str(guildId)] = Ruleset()
+        GuildSettings.rulesets[str(guildId)] = Ruleset()
 
 class MatchStatus(Enum):
     CHARACTER = 0
@@ -264,14 +275,14 @@ class Ruleset:
 
 class ScrapMatch:
     def __init__(self, player1, player2):
-        if self.player1.guildId == self.player2.guildId:
-            self.player1 = player1
-            self.player2 = player2
-            self.guildId = self.player1.guildId
+        self.player1 = player1.userId
+        self.player2 = player2.userId
+        self.guildId = player1.guildId
 
 class Match:
-    def __init__(self, message, guild, player1, player2, chooser, isBo5, promotion):
+    def __init__(self, message, channel, guild, player1, player2, chooser, isBo5, promotion):
         self.message = message
+        self.channel = channel
         self.guild = guild
         self.forfeitMessage = 0
         self.player1 = player1
@@ -294,7 +305,7 @@ class Match:
         self.promotion = promotion
 
     def incrementScore(self):
-        ruleset = MatchStat.getRuleset(self.guild)
+        ruleset = GuildSettings.getRuleset(self.guild)
         if ruleset.isDSR:
             self.dsrBans.append(self.bans[0])
 
@@ -347,30 +358,38 @@ class Match:
         self.status = MatchStatus.STRIKING
 
 def ready(guildId, messageId):
-    initServer(guildId, queueChannelId=865882258636406804, matchChannelId=865882224553623552, adminChannelId=867024058175979550, flairChannelId=865593981164847115, flairMessageId=messageId)
+    initServer(guildId, queueChannelId=865882258636406804, matchChannelId=865882224553623552, adminChannelId=867024058175979550, flairChannelId=865593981164847115, flairMessageId=messageId, isMultiChannel=True)
 
-def initServer(guildId, rankingRole="Ranking1v1", adminRankingRoles=["RankingStaff"], queueChannelId=0, matchChannelId=0, adminChannelId=0, flairChannelId=0, flairMessageId=0):
-    MatchStat.setRankingRole(guildId, rankingRole)
-    MatchStat.setAdminRoles(guildId, adminRankingRoles)
+def initServer(guildId, rankingRole="Ranking1v1", adminRankingRoles=["RankingStaff"], queueChannelId=0, matchChannelId=0, adminChannelId=0, flairChannelId=0, flairMessageId=0, isMultiChannel=False):
+    GuildSettings.setRankingRole(guildId, rankingRole)
+    GuildSettings.setAdminRoles(guildId, adminRankingRoles)
     
-    MatchStat.setQueueChannelId(guildId, queueChannelId)
-    MatchStat.setMatchChannelId(guildId, matchChannelId)
+    GuildSettings.setQueueChannelId(guildId, queueChannelId)
+    GuildSettings.setMatchChannelId(guildId, matchChannelId)
 
-    MatchStat.setAdminChannelId(guildId, adminChannelId)
+    GuildSettings.setAdminChannelId(guildId, adminChannelId)
 
-    MatchStat.setFlairChannelId(guildId, flairChannelId)
-    MatchStat.setFlairMessageId(guildId, flairMessageId)
+    GuildSettings.setFlairChannelId(guildId, flairChannelId)
+    GuildSettings.setFlairMessageId(guildId, flairMessageId)
 
-    MatchStat.initRuleset(guildId)
+    GuildSettings.initRuleset(guildId)
 
+    GuildSettings.setIsMultiChannelMode(guildId, isMultiChannel)
 
-async def getRankingRole(guild):
-    myRoleName = MatchStat.getRankingRole(guild.id)
+def getBotRole(client, guildId):
+    guild = client.get_guild(guildId)
+    myRole = discord.utils.get(guild.roles, name="ChallengeMe")    
+    return myRole
+
+def getRankingRole(client, guildId):
+    guild = client.get_guild(guildId)
+    myRoleName = GuildSettings.getRankingRole(guild.id)
     myRole = discord.utils.get(guild.roles, name=myRoleName)    
     return myRole
 
-async def getAdminRankingRoles(guild):
-    myRoles = MatchStat.getAdminRoles(guild.id)
+def getAdminRankingRoles(client, guildId):
+    guild = client.get_guild(guildId)
+    myRoles = GuildSettings.getAdminRoles(guild.id)
     returnRoles = []
     if myRoles:
         for myRoleName in myRoles:
@@ -381,26 +400,40 @@ async def getAdminRankingRoles(guild):
     return returnRoles
 
 async def queue(client, strMsg):
-    flag = checkUserInQueue(strMsg)
+    queueChannelId = client.get_channel(GuildSettings.getQueueChannelId(strMsg.guild.id))
+    flag = checkUserInQueue(strMsg.author.id)
     if flag:
-        queueChannelId = client.get_channel(MatchStat.queueChannelId[strMsg.guild.id])
         await queueChannelId.send("<@" + str(strMsg.author.id) + ">, you are already in waiting queue, please wait for your opponent!")
         return
 
-    flag = checkExistingMatch(strMsg)
+    flag = checkExistingMatch(strMsg.author.id)
     if flag:
-        queueChannelId = client.get_channel(MatchStat.queueChannelId[strMsg.guild.id])
         await queueChannelId.send("<@" + str(strMsg.author.id) + ">, you are already in a match, please finish your match!")
     else:
-        queueChannelId = client.get_channel(MatchStat.queueChannelId[strMsg.guild.id])
         await queueChannelId.send("<@" + str(strMsg.author.id) + ">, you have been added to the queue, waiting for opponent...")
         global waitingQueue
         queuedPlayer = QueuedPlayer(strMsg.author.id, strMsg.guild.id)
         waitingQueue.append(queuedPlayer)
 
+async def requeue(client, payload):
+    queueChannelId = client.get_channel(GuildSettings.getQueueChannelId(payload.guild_id))
+    flag = checkUserInQueue(payload.user_id)
+    if flag:
+        await queueChannelId.send("<@" + str(payload.user_id) + ">, you are already in waiting queue, please wait for your opponent!")
+        return
+
+    flag = checkExistingMatch(payload.user_id)
+    if flag:
+        await queueChannelId.send("<@" + str(payload.user_id) + ">, you are already in a match, please finish your match!")
+    else:
+        await queueChannelId.send("<@" + str(payload.user_id) + ">, you have been added to the queue, waiting for opponent...")
+        global waitingQueue
+        queuedPlayer = QueuedPlayer(payload.user_id, payload.guild_id)
+        waitingQueue.append(queuedPlayer)
+
 async def unqueue(client, strMsg):
-    queueChannelId = client.get_channel(MatchStat.queueChannelId[strMsg.guild.id])
-    flag = checkExistingMatch(strMsg)
+    queueChannelId = client.get_channel(GuildSettings.getQueueChannelId(strMsg.guild.id))
+    flag = checkExistingMatch(strMsg.author.id)
     if flag:
         await queueChannelId.send("<@" + str(strMsg.author.id) + ">, you are already in a match, please finish your match!")
         return
@@ -408,7 +441,7 @@ async def unqueue(client, strMsg):
     flag = False
     if waitingQueue:
         for user in waitingQueue:
-            if user.userId == strMsg.author.id and user.guildId == strMsg.guild.id:
+            if user.userId == strMsg.author.id:
                 await queueChannelId.send("<@" + str(strMsg.author.id) + ">, you have been removed from the queue by request!")
                 waitingQueue.remove(user)
                 flag = True
@@ -428,10 +461,7 @@ async def searchForMatch(client):
             scrapMatches = await try_match(client)
             if scrapMatches:
                 for scrapMatch in scrapMatches:
-                    await sendMessage(client, guild=scrapMatch.guildId, player1=scrapMatch.player1.userId, player2=scrapMatch.player2.userId)
-
-                    waitingQueue.remove(scrapMatch.player1)
-                    waitingQueue.remove(scrapMatch.player2)
+                    await sendMessage(client, guildId=scrapMatch.guildId, player1=scrapMatch.player1, player2=scrapMatch.player2)
                 
             lockedQueue = False
         elif count == 1:
@@ -440,18 +470,27 @@ async def searchForMatch(client):
 
 async def try_match(client):
     global waitingQueue
+    scrapMatches = []
     for queuedPlayer in waitingQueue:
         if datetime.utcnow() >= queuedPlayer.expiration:
             await removeFromQueue(client, queuedPlayer)
 
     # db connection and handling
 
-    scrapMatches = [ScrapMatch(waitingQueue[0], waitingQueue[1])]
+    if waitingQueue[0].guildId == waitingQueue[1].guildId:
+        waitingPlayer1 = waitingQueue[0]
+        waitingPlayer2 = waitingQueue[1]
+
+        scrapMatch = ScrapMatch(waitingPlayer1, waitingPlayer2)
+        scrapMatches.append(scrapMatch)
+        waitingQueue.remove(waitingPlayer1)
+        waitingQueue.remove(waitingPlayer2)
+
     return scrapMatches
 
 async def removeFromQueue(client, queuedPlayer):
     global waitingQueue
-    queueChannelId = client.get_channel(MatchStat.queueChannelId[queuedPlayer.guildId])
+    queueChannelId = client.get_channel(GuildSettings.getQueueChannelId(queuedPlayer.guildId))
     await queueChannelId.send("<@" + str(queuedPlayer.userId) + ">, we couldn't find you an opponent for ranked and you have been removed from the queue, please try again later.")
     waitingQueue.remove(queuedPlayer)
 
@@ -459,8 +498,6 @@ async def removeFromQueue(client, queuedPlayer):
 async def sendMessage(client, match=None, guildId=0, player1=0, player2=0):
     if match is not None and guildId == 0:
         guildId = match.guild
-
-    matchChannelId = client.get_channel(MatchStat.matchChannelId[guildId])
 
     if match is None:
         title = "Round 1!"
@@ -470,7 +507,7 @@ async def sendMessage(client, match=None, guildId=0, player1=0, player2=0):
         mainMessage = "Get ready for the next battle! \n"
     else:
         title = "Round " + str(match.round) + "!"
-        ruleset = MatchStat.getRuleset(match.guild)
+        ruleset = GuildSettings.getRuleset(match.guild)
         if match.status == MatchStatus.CHARACTER:
             if match.round == 1: 
                 description = "<@" + str(match.player1) + "> vs. <@"+ str(match.player2) +">! Check your DMs to pick your character!"
@@ -561,17 +598,30 @@ async def sendMessage(client, match=None, guildId=0, player1=0, player2=0):
     embed = discord.Embed(title=title, description=description)
     for name, value, inline in fields:
         embed.add_field(name=name, value=value, inline=inline)
-
-    message = await matchChannelId.send(mainMessage, embed=embed)
+   
     global listOfMatches
     if match is None:
-        match = Match(message.id, message.guild.id, player1, player2, playerChosen, False, False)
+        if GuildSettings.getIsMultiChannelMode(guildId):
+            channelId = await createMatchChannel(client, guildId, player1, player2)
+        else:
+            channelId = GuildSettings.getMatchChannelId(guildId)
+            
+        matchChannelId = client.get_channel(channelId)
+        message = await matchChannelId.send(mainMessage, embed=embed)
+        match = Match(message.id, channelId, guildId, player1, player2, playerChosen, False, False)
 
-        await sendMessageToUser(client, player1)
+        await sendMessageToUser(client, player1, False)
+        
         forfeitMessage = await sendTieOrForfeitMessage(client, match)
         match.forfeitMessage = forfeitMessage.id
 
         listOfMatches.append(match)
+    else:
+        if match.status == MatchStatus.END:
+            matchChannelId = client.get_channel(GuildSettings.getMatchChannelId(guildId))
+        else:
+            matchChannelId = client.get_channel(getMatchChannel(match))
+        message = await matchChannelId.send(mainMessage, embed=embed)
         
     if match.status == MatchStatus.STRIKING:
         await add_ban_reaction(message, listOfBans)
@@ -580,12 +630,63 @@ async def sendMessage(client, match=None, guildId=0, player1=0, player2=0):
     elif match.status == MatchStatus.RESULTS:
         await add_decision_reaction(message)
     elif match.status == MatchStatus.END:
+        #await stayInQueue(client, match)
+        await deleteRankedChannels(client, match)
         listOfMatches.remove(match)
 
     return message
 
+def getMatchChannel(match):
+    if GuildSettings.getIsMultiChannelMode(match.guild):
+        return match.channel
+    else:
+        return GuildSettings.getMatchChannelId(match.guild)
+
+async def createMatchChannel(client, guildId, player1, player2):
+    guild = client.get_guild(guildId)
+    user1 = guild.get_member(player1)
+    user2 = guild.get_member(player2)
+
+    category = await guild.create_category(user1.name.upper() + " vs. " + user2.name.upper())    
+
+    for userRole in user1.roles:
+        if userRole.name == "@everyone":
+            everyoneRole = userRole
+            pass
+    
+    textChannel = await category.create_text_channel(user1.name.lower() + "-vs-" + user2.name.lower())
+
+    botRole = getBotRole(client, guildId)
+
+    await category.set_permissions(botRole, view_channel=True, send_messages=True)
+    adminRoles = getAdminRankingRoles(client, guildId)
+    for adminRole in adminRoles:
+        await category.set_permissions(adminRole, view_channel=True, send_messages=True)
+
+    await category.set_permissions(user1, view_channel=True, send_messages=False)
+    await category.set_permissions(user2, view_channel=True, send_messages=False)
+
+    await category.set_permissions(everyoneRole, view_channel=False)
+    
+    return textChannel.id
+
+async def deleteRankedChannels(client, match):
+    guild = client.get_guild(match.guild)
+    channel = guild.get_channel(match.channel)
+    category = channel.category
+
+    await channel.delete()
+    await category.delete()
+
+async def stayInQueue(client, match):
+    queueChannel = client.get_channel(GuildSettings.getQueueChannelId(match.guild))
+    message1 = await queueChannel.send("<@" + str(match.player1) + ">, if you wish to stay in queue, please react to this message.")
+    await message1.add_reaction("🔁")
+    message2 = await queueChannel.send("<@" + str(match.player2) + ">, if you wish to stay in queue, please react to this message.")
+    await message2.add_reaction("🔁")
+
 async def sendTieOrForfeitMessage(client, match):
-    matchChannelId = client.get_channel(MatchStat.matchChannelId[match.guild])
+    matchChannelId = client.get_channel(getMatchChannel(match))
     embed = discord.Embed(title="Tie or Forfeit?", description="Both players need to agree on tie! \nOnly one player can forfeit.")
     mainMessage = "Tie or Forfeit? \n**<@" + str(match.player1) + ">** vs. **<@"+ str(match.player2) +">**"
     message = await matchChannelId.send(mainMessage, embed=embed)
@@ -608,10 +709,19 @@ def choosePlayer(player1, player2):
     else:
         return player2
 
-async def sendMessageToUser(client, player, char=""):
+async def sendMessageToUser(client, player, rechoose, char=""):
     user = client.get_user(player)
     embed = discord.Embed(title="Example:", description="!char donkeykong \n!char dk \n!char donkey_kong")
-    await user.send("Choose your character by sending the command **!char** *[name_or_alias_of_your_character_here]*", embed=embed)
+    mainMessagePreffix = "Choose your character by sending the command **!char** *[name_or_alias_of_your_character_here]*"
+    if rechoose:
+        mainMessage = mainMessagePreffix + "\n Or you can react to keep the same character as before!"
+    else:
+        mainMessage = mainMessagePreffix
+
+    message = await user.send(mainMessage, embed=embed)
+    if rechoose:
+        await message.add_reaction("🔁")
+
     if char != "":
         await user.send("Your opponent chose: **" + char + "**")
 
@@ -637,14 +747,15 @@ async def validateChar(client, message):
     parts = text.split(" ", 1)
     if len(parts) != 2:
         await user.send("Wrong input, please try again!")
-        await sendMessageToUser(client, userId)
+        await sendMessageToUser(client, userId, match.round != 1)
     else:
-        ruleset = MatchStat.getRuleset(match.guild)
+        ruleset = GuildSettings.getRuleset(match.guild)
         char = ruleset.getCharacterName(parts[1])
         if char == "INVALID":
             await user.send("Wrong input, please try again!")
-            await sendMessageToUser(client, userId)
+            await sendMessageToUser(client, userId, match.round != 1)
         else:
+            await user.send("You've selected: **" + char + "**")
             listToCheck.append(char)
             if match.player1 == message.author.id:
                 match.player1chars = listToCheck 
@@ -653,12 +764,12 @@ async def validateChar(client, message):
             
             if len(match.player1chars) != len(match.player2chars):
                 if match.round == 1:
-                    await sendMessageToUser(client, match.player2)
+                    await sendMessageToUser(client, match.player2, match.round != 1)
                 else:
                     if len(match.player1chars) < len(match.player2chars):
-                        await sendMessageToUser(client, match.player1, char)
+                        await sendMessageToUser(client, match.player1, match.round != 1, char)
                     else:
-                        await sendMessageToUser(client, match.player2, char)
+                        await sendMessageToUser(client, match.player2, match.round != 1, char)
             else:
                 if match.round == 1:
                     match.status = MatchStatus.STRIKING
@@ -667,10 +778,50 @@ async def validateChar(client, message):
 
                 await resendMessage(client, match)
 
-            await user.send("You've selected: **" + char + "**")
+async def resendCharacter(client, message, reactionUserId):
+    if not contains(lambda x: x.player1 == reactionUserId or x.player2 == reactionUserId):
+        return
+
+    match = get(lambda x: x.player1 == reactionUserId or x.player2 == reactionUserId)
+
+    if match.player1 == reactionUserId:
+        listToCheck = match.player1chars
+        userId = match.player1
+    else:
+        listToCheck = match.player2chars
+        userId = match.player2
+
+    user = client.get_user(userId)
+
+    if (match.round == 1 and listToCheck) or (match.round == 2 and len(listToCheck) != 1) or (match.round == 3 and len(listToCheck) != 2) or (match.isBo5 and match.round == 4 and len(listToCheck) != 3) or (match.isBo5 and match.round == 5 and len(listToCheck) != 4):
+        await user.send("No need to select a character, you've already selected: + " + match.player1chars[-1] + "!")
+
+    lastCharacter = listToCheck[-1]
+    await user.send("You've selected: **" + lastCharacter + "**")
+    listToCheck.append(lastCharacter)
+    if match.player1 == reactionUserId:
+        match.player1chars = listToCheck 
+    else:
+        match.player2chars = listToCheck 
+    
+    if len(match.player1chars) != len(match.player2chars):
+        if match.round == 1:
+            await sendMessageToUser(client, match.player2, match.round != 1)
+        else:
+            if len(match.player1chars) < len(match.player2chars):
+                await sendMessageToUser(client, match.player1, match.round != 1, lastCharacter)
+            else:
+                await sendMessageToUser(client, match.player2, match.round != 1, lastCharacter)
+    else:
+        if match.round == 1:
+            match.status = MatchStatus.STRIKING
+        else:
+            match.status = MatchStatus.PLAYING
+
+        await resendMessage(client, match)
 
 async def resendMessage(client, match):
-    channel = client.get_channel(MatchStat.matchChannelId[match.guild])
+    channel = client.get_channel(getMatchChannel(match))
     message = await channel.fetch_message(match.message)
     oldForfeitMessage = await channel.fetch_message(match.forfeitMessage)
     oldmessage = message.id
@@ -686,28 +837,28 @@ async def resendMessage(client, match):
 
     replace(match, lambda x: x.message == oldmessage)
 
-def checkExistingMatch(message):
-    if contains(lambda x: (x.player1 == message.author.id or x.player2 == message.author.id) and x.guild == message.guild.id):       
+def checkExistingMatch(userId):
+    if contains(lambda x: x.player1 == userId or x.player2 == userId):       
         return True
 
     return False
 
-def checkUserInQueue(message):
+def checkUserInQueue(userId):
     global waitingQueue
     if waitingQueue:
         for user in waitingQueue:
-            if user.userId == message.author.id and user.guildId == message.guild.id:
+            if user.userId == userId:
                 return True
 
     return False
 
 async def getValidMatch(payload):
-    if payload.channel_id != MatchStat.matchChannelId[payload.guild_id]:       
-        return None
     if not contains(lambda x: (x.player1 == payload.user_id or x.player2 == payload.user_id) and x.guild == payload.guild_id):       
         return None
     match = get(lambda x: (x.player1 == payload.user_id or x.player2 == payload.user_id) and x.guild == payload.guild_id)
     if match is None:
+        return None
+    if payload.channel_id != getMatchChannel(match):       
         return None
     if payload.message_id != match.message and payload.message_id != match.forfeitMessage:       
         return None
@@ -717,7 +868,7 @@ async def getValidMatch(payload):
 async def getValidMatchAdmin(playerId, guildId):
     if not contains(lambda x: (x.player1 == playerId or x.player2 == playerId) and x.guild == guildId):       
         return None
-    match = get(lambda x: (x.player1 == playerId or x.player2 == playerId) and x.guild == guildId)
+    match = get(lambda x: (x.player1 == playerId or x.player2 == playerId)  and x.guild == guildId)
     if match is None:
         return None
     
@@ -729,7 +880,7 @@ async def tieOrForfeit(client, payload, match):
         flag = True
         match.forfeit(payload.user_id)
     elif payload.emoji.name == "🤝":
-        channel = client.get_channel(MatchStat.matchChannelId[match.guild_id])
+        channel = client.get_channel(getMatchChannel(match))
         message = await channel.fetch_message(match.forfeitMessage)
         if message.reactions:
             for reaction in message.reactions:
@@ -774,7 +925,7 @@ async def stageStriking(client, payload, match):
 
                 match.bans = [text]
                 match.status = MatchStatus.CHARACTER
-                await sendMessageToUser(client, match.chooser)
+                await sendMessageToUser(client, match.chooser, match.round != 1)
 
         await resendMessage(client, match)
 
@@ -931,7 +1082,7 @@ async def adminResetSet(client, guildId, match):
     player2 = match.player2
     global listOfMatches
     listOfMatches.remove(match)
-    await sendMessage(client, guilld=guildId, player1=player1, player2=player2)
+    await sendMessage(client, guildId=guildId, player1=player1, player2=player2)
 
 async def adminResetMatch(client, guildId, match):
     if match.round == 1 or match.round - 1 == 1:
@@ -940,12 +1091,12 @@ async def adminResetMatch(client, guildId, match):
         match.reset()
         await resendMessage(client, match)
 
-async def adminRemoveFromQueue(client, strMsg, player, guild):
+async def adminRemoveFromQueue(client, player, guild):
     global waitingQueue
     if waitingQueue:
         for user in waitingQueue:
             if user.userId == player and user.guildId == guild:
-                queueChannelId = client.get_channel(MatchStat.queueChannelId[strMsg.guild.id])
+                queueChannelId = client.get_channel(GuildSettings.getQueueChannelId(guild))
                 await queueChannelId.send("<@" + str(player) + ">, you have been removed from the queue by the admin!")
                 waitingQueue.remove(user)
                 return True
@@ -956,7 +1107,7 @@ async def adminClearQueue(client, guild):
     if waitingQueue:
         for user in waitingQueue:
             if user.guildId == guild:
-                queueChannelId = client.get_channel(MatchStat.queueChannelId[user.guildId])
+                queueChannelId = client.get_channel(GuildSettings.getQueueChannelId(guild))
                 await queueChannelId.send("<@" + str(user.userId) + ">, you have been removed from the queue by the admin!")
                 waitingQueue.remove(user)
 
@@ -968,7 +1119,7 @@ async def adminAddStarter(guildId, channel, message):
     parts = text.split(" ", 1)
     flag = True
     if len(parts) == 2:
-        ruleset = MatchStat.getRuleset(guildId)
+        ruleset = GuildSettings.getRuleset(guildId)
         stage = ruleset.getStageName(parts[1])
         if stage != "INVALID":
             for starter in ruleset.starters:
@@ -986,7 +1137,7 @@ async def adminAddStarter(guildId, channel, message):
         await channel.send("<@" + str(message.author.id) + ">, invalid input or stage already added to the list!")
     else:
         ruleset.starters.append(stage)
-        MatchStat.setRuleset(guildId, ruleset)
+        GuildSettings.setRuleset(guildId, ruleset)
         await channel.send("<@" + str(message.author.id) + ">, stage added to starters: " + stage + "!")
 
 async def adminRemoveStarter(guildId, channel, message):
@@ -994,7 +1145,7 @@ async def adminRemoveStarter(guildId, channel, message):
     parts = text.split(" ", 1)
     flag = False
     if len(parts) == 2:
-        ruleset = MatchStat.getRuleset(guildId)
+        ruleset = GuildSettings.getRuleset(guildId)
         stage = ruleset.getStageName(parts[1])
         if stage != "INVALID":
             for starter in ruleset.starters:
@@ -1006,7 +1157,7 @@ async def adminRemoveStarter(guildId, channel, message):
         await channel.send("<@" + str(message.author.id) + ">, invalid input or stage not in starters!")
     else:
         ruleset.starters.remove(stage)
-        MatchStat.setRuleset(guildId, ruleset)
+        GuildSettings.setRuleset(guildId, ruleset)
         await channel.send("<@" + str(message.author.id) + ">, stage removed from starters: " + stage + "!")
 
 async def adminAddCP(guildId, channel, message):
@@ -1014,7 +1165,7 @@ async def adminAddCP(guildId, channel, message):
     parts = text.split(" ", 1)
     flag = False
     if len(parts) == 2:
-        ruleset = MatchStat.getRuleset(guildId)
+        ruleset = GuildSettings.getRuleset(guildId)
         stage = ruleset.getStageName(parts[1])
         if stage != "INVALID":
             for counterpick in ruleset.counterPicks:
@@ -1032,7 +1183,7 @@ async def adminAddCP(guildId, channel, message):
         await channel.send("<@" + str(message.author.id) + ">, invalid input or stage already added to the list!")
     else:
         ruleset.counterPicks.append(stage)
-        MatchStat.setRuleset(guildId, ruleset)
+        GuildSettings.setRuleset(guildId, ruleset)
         await channel.send("<@" + str(message.author.id) + ">, stage added to counter-picks: " + stage + "!")
 
 async def adminRemoveCP(guildId, channel, message):
@@ -1040,7 +1191,7 @@ async def adminRemoveCP(guildId, channel, message):
     parts = text.split(" ", 1)
     flag = False
     if len(parts) == 2:
-        ruleset = MatchStat.getRuleset(guildId)
+        ruleset = GuildSettings.getRuleset(guildId)
         stage = ruleset.getStageName(parts[1])
         if stage != "INVALID":
             for counterpick in ruleset.counterPicks:
@@ -1052,36 +1203,42 @@ async def adminRemoveCP(guildId, channel, message):
         await channel.send("<@" + str(message.author.id) + ">, invalid input or stage not in counter-picks!")
     else:
         ruleset.counterPicks.remove(stage)
-        MatchStat.setRuleset(guildId, ruleset)
+        GuildSettings.setRuleset(guildId, ruleset)
         await channel.send("<@" + str(message.author.id) + ">, stage removed from counter-picks: " + stage + "!")
 
 def adminSetDSR(guildId):
-    ruleset = MatchStat.getRuleset(guildId)
+    ruleset = GuildSettings.getRuleset(guildId)
     ruleset.isDSR = True
     ruleset.isMDSR = False
     ruleset.isTSR = False
-    MatchStat.setRuleset(guildId, ruleset)
+    GuildSettings.setRuleset(guildId, ruleset)
 
 def adminSetMDSR(guildId):
-    ruleset = MatchStat.getRuleset(guildId)
+    ruleset = GuildSettings.getRuleset(guildId)
     ruleset.isDSR = False
     ruleset.isMDSR = True
     ruleset.isTSR = False
-    MatchStat.setRuleset(guildId, ruleset)
+    GuildSettings.setRuleset(guildId, ruleset)
 
 def adminSetTSR(guildId):
-    ruleset = MatchStat.getRuleset(guildId)
+    ruleset = GuildSettings.getRuleset(guildId)
     ruleset.isDSR = False
     ruleset.isMDSR = False
     ruleset.isTSR = True
-    MatchStat.setRuleset(guildId, ruleset)
+    GuildSettings.setRuleset(guildId, ruleset)
 
 def adminSetNoDSR(guildId):
-    ruleset = MatchStat.getRuleset(guildId)
+    ruleset = GuildSettings.getRuleset(guildId)
     ruleset.isDSR = False
     ruleset.isMDSR = False
     ruleset.isTSR = False
-    MatchStat.setRuleset(guildId, ruleset)
+    GuildSettings.setRuleset(guildId, ruleset)
+
+def adminSetMultiChannel(guildId):
+    GuildSettings.setIsMultiChannelMode(guildId, True)
+
+def adminSetSingleChannel(guildId):
+    GuildSettings.setIsMultiChannelMode(guildId, False)
 
 async def adminSetCounterPickBanCount(guildId, channel, message):
     parts = message.content.split(" ", 1)
@@ -1096,12 +1253,12 @@ async def adminSetCounterPickBanCount(guildId, channel, message):
             flag = False
 
         if flag:
-            ruleset = MatchStat.getRuleset(guildId)
+            ruleset = GuildSettings.getRuleset(guildId)
             if count <= 0 or count > 3:
                 flag = False
             else:
                 ruleset.counterPickBans = count
-                MatchStat.setRuleset(guildId, ruleset)
+                GuildSettings.setRuleset(guildId, ruleset)
 
         if flag:
             await channel.send("<@" + str(message.author.id) + ">, the ruleset has set " + count + " winner bans in Round 2+!")
@@ -1110,7 +1267,7 @@ async def adminSetCounterPickBanCount(guildId, channel, message):
 
 def adminAddStaffRole(client, guildId, roleId):
     role = getRole(client, guildId, roleId)
-    adminRoles = MatchStat.getAdminRoles(guildId)
+    adminRoles = GuildSettings.getAdminRoles(guildId)
     flag = True
     if adminRoles:
         for adminRole in adminRoles:
@@ -1119,13 +1276,13 @@ def adminAddStaffRole(client, guildId, roleId):
                 pass
     if flag:
         adminRoles.append(role.name)
-        MatchStat.setAdminRoles(guildId, adminRoles)
+        GuildSettings.setAdminRoles(guildId, adminRoles)
 
     return flag
 
 def adminRemoveStaffRole(client, guildId, roleId):
     role = getRole(client, guildId, roleId)
-    adminRoles = MatchStat.getAdminRoles(guildId)
+    adminRoles = GuildSettings.getAdminRoles(guildId)
     flag = False
     if adminRoles:
         for adminRole in adminRoles:
@@ -1133,13 +1290,13 @@ def adminRemoveStaffRole(client, guildId, roleId):
                 adminRoles.remove(adminRole)
                 flag == True
     if flag:
-        MatchStat.setAdminRoles(guildId, adminRoles)
+        GuildSettings.setAdminRoles(guildId, adminRoles)
 
     return flag
 
 def adminSetRankingRole(client, guildId, roleId):
     role = getRole(client, guildId, roleId)
-    MatchStat.setRankingRole(guildId, role.name)
+    GuildSettings.setRankingRole(guildId, role.name)
     
 def getRole(client, guildId, roleId):
     guild = client.get_guild(guildId)
@@ -1147,27 +1304,27 @@ def getRole(client, guildId, roleId):
     return role
 
 def adminSetQueueChannel(guildId, channelId):
-    MatchStat.setQueueChannelId(guildId, channelId)
+    GuildSettings.setQueueChannelId(guildId, channelId)
 
 def adminSetMatchChannel(guildId, channelId):
-    MatchStat.setMatchChannelId(guildId, channelId)
+    GuildSettings.setMatchChannelId(guildId, channelId)
 
 def adminSetFlairChannel(guildId, channelId):
-    MatchStat.setFlairChannelId(guildId, channelId)
+    GuildSettings.setFlairChannelId(guildId, channelId)
 
 async def adminSendFlairMessage(client, guildId, message):
-    channelId = MatchStat.getFlairChannelId(guildId)
+    channelId = GuildSettings.getFlairChannelId(guildId)
     if channelId != 0:
         channel = client.get_channel(channelId)
         if channel is not None:
             message = await channel.send("React to me! \nUse our commands that you can find by typing \"!help\"")
             await message.add_reaction("🥏")
-            MatchStat.setFlairMessageId(message.id)
+            GuildSettings.setFlairMessageId(guildId, message.id)
             return True
     
     return False
 
-async def adminSetFlairMessage(channel, message):
+async def adminSetFlairMessage(guildId, channel, message):
     parts = message.content.split(" ", 1)
     if len(parts) != 2:
         await channel.send("<@" + str(message.author.id) + ">, invalid input!")
@@ -1180,7 +1337,7 @@ async def adminSetFlairMessage(channel, message):
             flag = False
 
         if flag:
-            MatchStat.setFlairMessageId(count)
+            GuildSettings.setFlairMessageId(guildId, count)
             await channel.send("<@" + str(message.author.id) + ">, the flair message has been set")
         else:
             await channel.send("<@" + str(message.author.id) + ">, invalid message!")
