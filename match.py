@@ -654,7 +654,9 @@ async def createMatchChannel(client, guildId, player1, player2):
             everyoneRole = userRole
             pass
     
-    textChannel = await category.create_text_channel(user1.name.lower() + "-vs-" + user2.name.lower())
+    textMatchChannel = await category.create_text_channel(user1.name.lower() + "-vs-" + user2.name.lower() + "-match")
+    textDiscussionChannel = await category.create_text_channel(user1.name.lower() + "-vs-" + user2.name.lower() + "-discussion")
+    voiceChannel = await category.create_voice_channel(user1.name.lower() + "-vs-" + user2.name.lower() + "-voice")
 
     botRole = getBotRole(client, guildId)
 
@@ -666,16 +668,24 @@ async def createMatchChannel(client, guildId, player1, player2):
     await category.set_permissions(user1, view_channel=True, send_messages=False)
     await category.set_permissions(user2, view_channel=True, send_messages=False)
 
+    await textDiscussionChannel.set_permissions(user1, send_messages=True)
+    await textDiscussionChannel.set_permissions(user2, send_messages=True)
+
     await category.set_permissions(everyoneRole, view_channel=False)
     
-    return textChannel.id
+    return textMatchChannel.id
 
 async def deleteRankedChannels(client, match):
     guild = client.get_guild(match.guild)
     channel = guild.get_channel(match.channel)
     category = channel.category
 
-    await channel.delete()
+    for textChannel in category.text_channels:
+        await textChannel.delete()
+
+    for voiceChannel in category.voice_channels:
+        await voiceChannel.delete()
+
     await category.delete()
 
 async def stayInQueue(client, match):
