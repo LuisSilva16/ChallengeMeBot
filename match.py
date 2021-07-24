@@ -139,92 +139,92 @@ class Ruleset:
         self.starters = ["Battlefield", "Final Destination", "Smashville", "Pokémon Stadium 2", "Town & City"]
         self.counterPicks = ["Small Battlefield", "Yoshi's Story", "Lylat Cruise", "Kalos Pokémon League"]
         self.characters = {
-            "Mario": ["mario", "number1"], #1
-            "Donkey Kong": ["dk", "donkey", "donkey_kong", "donkeykong"], #2
-            "Link": ["link", "link1", "botw_link", "botwlink", "botw"], #3
-            "Samus": ["samus"], #4
-            "Dark Samus": ["dsamus", "samuse", "darksamus", "dark_samus"], #4e
-            "Yoshi": ["yoshi"], #5
-            "Kirby": ["kirby"], #6
-            "Fox": ["fox", "spacie1", "melee"], #7
-            "Pikachu": ["pika", "pikachu", "rat1", "smash64"], #8
-            "Luigi": ["luigi", "number2"], #9
-            "Ness": ["ness", "pk1"], #10
-            "Captain Falcon": ["falcon", "captain", "cap", "captainfalcon", "captain_falcon"], #11
-            "Jigglypuff": ["puff", "purin", "jigglypuff", "jigg", "jiggly"], #12
-            "Peach": ["peach", "princesspeach", "princess_peach"], #13
-            "Daisy": ["daisy", "princessdaisy", "princess_daisy", "hiimdaisy", "princess2"], #13e
-            "Bowser": ["bowser", "koopa", "kingkoopa", "king_koopa"], #14
-            "Ice Climbers": ["icies", "climbers", "iceclimbers", "ice_climbers"], #15
-            "Sheik": ["sheik"], #16
-            "Zelda": ["zelda", "princesszelda", "princess_zelda", "wisdom"], #17
-            "Dr. Mario": ["doc", "docmario", "doc_mario", "dr", "drmario", "dr_mario"], #18
-            "Pichu": ["pichu", "rat2"], #19
-            "Falco": ["falco", "spacie2"], #20
-            "Marth": ["marth", "swordie1"], #21
-            "Lucina": ["lucina", "swordie1e"], #21e
-            "Young Link": ["yink", "young", "link2", "younglink", "young_link", "ootlink", "oot_link", "oot", "courage"], #22
-            "Ganondorf": ["ganon", "ganondorf", "kingofevil", "king_of_evil", "power"], #23
-            "Mewtwo": ["mew2", "mewtwo", "m2"], #24
-            "Roy": ["roy", "roy1", "ourboy", "swordie2"], #25
-            "Chrom": ["chrom", "swordie2e"], #25e
-            "Mr. Game & Watch": ["gnw", "g&w", "gew", "gandw", "g_and_w", "gw", "gameandwatch", "game_and_watch", "mrgameandwatch", "mr_game_and_watch"], #26
-            "Meta Knight": ["metaknight", "meta_knight", "mk", "brawl"], #27
-            "Pit": ["pit"], #28
-            "Dark Pit": ["pit2", "pitoo", "dpit", "darkpit", "dark_pit", "blackpit", "black_pit"], #28e
-            "Zero Suit Samus": ["samus2", "zss", "zero", "zerosuit", "zerosuitsamus", "zero_suit", "zero_suit_samus"], #29
-            "Wario": ["wario", "waluigi", "waaaa"], #30
-            "Snake": ["snake", "solid", "solidsnake", "solid_snake"], #31
-            "Ike": ["ike", "swordie3"], #32
-            "Pokémon Trainer": ["pt", "pokemon", "pokémon", "pokemontrainer", "pokémontrainer", "pokemon_trainer", "pokémon_trainer", "squirtle", "zenigame", "ivysaur", "ivy", "fushigisou", "charizard", "zard", "zardop", "lizardon"], #33-35
-            "Diddy Kong": ["diddy", "diddykong", "diddy_kong"], #36
-            "Lucas": ["lucas", "pk2"], #37
-            "Sonic": ["sonic", "ur2slow"], #38
-            "King Dedede": ["d3", "dedede", "ddd", "kingdedede", "king_dedede", "kingddd", "king_ddd"], #39
-            "Olimar": ["olimar", "captainolimar", "captain_olimar", "alph"], #40
-            "Lucario": ["lucario"], #41
-            "R.O.B.": ["rob", "r.o.b.", "robot"], #42
-            "Toon Link": ["tink", "toon" , "link3", "toonlink", "toon_link", "ww_link", "wwlink", "ww"], #43
-            "Wolf": ["wolf", "spacie3"], #44
-            "Villager": ["villager"], #45
-            "Mega Man": ["megaman", "mm", "rock", "rockman", "mega_man", "rock_man"], #46
-            "Wii Fit Trainer": ["wft", "wii", "wiifit", "wiifittrainer", "wii_fit_trainer"], #47
-            "Rosalina & Luma": ["rosalina", "princessrosalina", "princess_rosalina", "rosa", "luma", "rosalina", "rosetta", "rosalinaluma", "rosalinanluma", "rosalina&luma", "rosalina_and_luma"], #48
-            "Little Mac": ["mac", "lilmac", "lil_mac", "littlemac", "little_mac"], #49
-            "Greninja": ["gren", "greninja", "gekkouga"], #50
-            "Mii Brawler": ["miibrawler", "mii_brawler", "brawler", "mii1"], #51
-            "Mii Swordfighter": ["miiswordfighter", "miiswordie", "mii_swordfighter", "mii_swordie", "swordfighter", "swordie", "mii2"], #52
-            "Mii Gunner": ["miigunner", "mii_gunner", "gunner", "mii3"], #53
-            "Palutena": ["palu", "palutena", "washingmachine"], #54
-            "PAC-MAN": ["pac", "pacman", "pac_man"], #55
-            "Robin": ["robin", "swordie4"], #56
-            "Shulk": ["shulk"], #57
-            "Bowser Jr.": ["bowserjr", "bowser_jr", "koopajr", "koopa_jr", "princekoopa", "prince_koopa", "ludwig", "larry", "morton", "wendy", "iggy", "roy2", "royk", "roykoopa", "roy_koopa", "lemmy"], #58
-            "Duck Hunt": ["duckhunt", "dh", "duck", "duckhuntduo", "duck_hunt_duo", "fakebanjo"], #59
-            "Ryu": ["ryu", "shoto"], #60
-            "Ken": ["ken", "shotoe"], #60e
-            "Cloud": ["cloud", "strife", "cloudstrife", "cloud_strife"], #61
-            "Corrin": ["corrin", "corn", "swordie5"], #62
-            "Bayonetta": ["bayo", "bayonetta", "sm4sh"], #63
-            "Inkling": ["inkling", "inklinggirl", "inklingboy", "inkling_girl", "inkling_boy"], #64
-            "Ridley": ["ridley"], #65
-            "Simon": ["simon", "belmont", "simonbelmont", "simon_belmont"], #66
-            "Richter": ["richter", "belmonte", "richterbelmont", "richter_belmont"], #66e
-            "King K. Rool": ["krool", "rool", "kkr", "kingkrool", "king_krool"], #67
-            "Isabelle": ["isabelle", "isa", "belle", "bell", "is_a_belle", "shizue"], #68
-            "Incineroar": ["incineroar", "incin", "gaogaen"], #69
-            "Piranha Plant": ["piranhaplant", "piranha_plant", "plant", "plantgang"], #70
-            "Joker": ["joker", "arsene", "ultimate"], #71
-            "Hero": ["hero", "luminary", "eight", "erdrick", "solo", "slotmachine", "goku", "trunks", "c17"], #72
-            "Banjo & Kazooie": ["banjo", "kazooie", "bk", "banjokazooie", "banjo&kazooie", "banjonkazooie", "banjo_kazooie", "banjo_and_kazooie", "bear_and_bird"], #73
-            "Terry": ["terry", "bogard", "terrybogard", "terry_bogard"], #74
-            "Byleth": ["byleth", "swordie6"], #75
-            "Min Min": ["minmin", "min_min"], #76
-            "Steve": ["steve", "alex", "zombie", "enderman", "ender", "herobrine", "trump"], #77
-            "Sephiroth": ["sephiroth", "seph"], #78
-            "Pyra / Mythra": ["pyra", "mythra", "pyramythra", "pyra_mythra", "pm", "aegis"], #79-80
-            "Kazuya": ["kazuya", "mishima", "kazuyamishima", "kazuya_mishima", "devil"], #81
-            "Random": ["random", "?", "idk", "jesustakethewheel"] #random
+            "Mario": ["1", "mario", "number1"], #1
+            "Donkey Kong": ["2", "dk", "donkey", "donkey_kong", "donkeykong"], #2
+            "Link": ["3", "link", "link1", "botw_link", "botwlink", "botw"], #3
+            "Samus": ["4", "samus"], #4
+            "Dark Samus": ["4e", "dsamus", "samuse", "darksamus", "dark_samus"], #4e
+            "Yoshi": ["5", "yoshi"], #5
+            "Kirby": ["6", "kirby"], #6
+            "Fox": ["7", "fox", "spacie1", "melee"], #7
+            "Pikachu": ["8", "pika", "pikachu", "rat1", "smash64"], #8
+            "Luigi": ["9", "luigi", "number2"], #9
+            "Ness": ["10", "ness", "pk1"], #10
+            "Captain Falcon": ["11", "falcon", "captain", "cap", "captainfalcon", "captain_falcon"], #11
+            "Jigglypuff": ["12", "puff", "purin", "jigglypuff", "jigg", "jiggly"], #12
+            "Peach": ["13", "peach", "princesspeach", "princess_peach"], #13
+            "Daisy": ["13e", "daisy", "princessdaisy", "princess_daisy", "hiimdaisy", "princess2"], #13e
+            "Bowser": ["14", "bowser", "koopa", "kingkoopa", "king_koopa"], #14
+            "Ice Climbers": ["15", "icies", "climbers", "iceclimbers", "ice_climbers"], #15
+            "Sheik": ["16", "sheik"], #16
+            "Zelda": ["17", "zelda", "princesszelda", "princess_zelda", "wisdom"], #17
+            "Dr. Mario": ["18", "doc", "docmario", "doc_mario", "dr", "drmario", "dr_mario"], #18
+            "Pichu": ["19", "pichu", "rat2"], #19
+            "Falco": ["20", "falco", "spacie2"], #20
+            "Marth": ["21", "marth", "swordie1"], #21
+            "Lucina": ["21e", "lucina", "swordie1e"], #21e
+            "Young Link": ["22", "yink", "young", "link2", "younglink", "young_link", "ootlink", "oot_link", "oot", "courage"], #22
+            "Ganondorf": ["23", "ganon", "ganondorf", "kingofevil", "king_of_evil", "power"], #23
+            "Mewtwo": ["24", "mew2", "mewtwo", "m2"], #24
+            "Roy": ["25", "roy", "roy1", "ourboy", "swordie2"], #25
+            "Chrom": ["25e", "chrom", "swordie2e"], #25e
+            "Mr. Game & Watch": ["26", "gnw", "g&w", "gew", "gandw", "g_and_w", "gw", "gameandwatch", "game_and_watch", "mrgameandwatch", "mr_game_and_watch"], #26
+            "Meta Knight": ["27", "metaknight", "meta_knight", "mk", "brawl"], #27
+            "Pit": ["28", "pit"], #28
+            "Dark Pit": ["28e", "pit2", "pitoo", "dpit", "darkpit", "dark_pit", "blackpit", "black_pit"], #28e
+            "Zero Suit Samus": ["29", "samus2", "zss", "zero", "zerosuit", "zerosuitsamus", "zero_suit", "zero_suit_samus"], #29
+            "Wario": ["30", "wario", "waluigi", "waaaa"], #30
+            "Snake": ["31", "snake", "solid", "solidsnake", "solid_snake"], #31
+            "Ike": ["32", "ike", "swordie3"], #32
+            "Pokémon Trainer": ["33", "34", "35", "pt", "pokemon", "pokémon", "pokemontrainer", "pokémontrainer", "pokemon_trainer", "pokémon_trainer", "squirtle", "zenigame", "ivysaur", "ivy", "fushigisou", "charizard", "zard", "zardop", "lizardon"], #33-35
+            "Diddy Kong": ["36", "diddy", "diddykong", "diddy_kong"], #36
+            "Lucas": ["37", "lucas", "pk2"], #37
+            "Sonic": ["38", "sonic", "ur2slow"], #38
+            "King Dedede": ["39", "d3", "dedede", "ddd", "kingdedede", "king_dedede", "kingddd", "king_ddd"], #39
+            "Olimar": ["40", "olimar", "captainolimar", "captain_olimar", "alph"], #40
+            "Lucario": ["41", "lucario"], #41
+            "R.O.B.": ["42", "rob", "r.o.b.", "robot"], #42
+            "Toon Link": ["43", "tink", "toon" , "link3", "toonlink", "toon_link", "ww_link", "wwlink", "ww"], #43
+            "Wolf": ["44", "wolf", "spacie3"], #44
+            "Villager": ["45", "villager"], #45
+            "Mega Man": ["46", "megaman", "mm", "rock", "rockman", "mega_man", "rock_man"], #46
+            "Wii Fit Trainer": ["47", "wft", "wii", "wiifit", "wiifittrainer", "wii_fit_trainer"], #47
+            "Rosalina & Luma": ["48", "rosalina", "princessrosalina", "princess_rosalina", "rosa", "luma", "rosalina", "rosetta", "rosalinaluma", "rosalinanluma", "rosalina&luma", "rosalina_and_luma"], #48
+            "Little Mac": ["49", "mac", "lilmac", "lil_mac", "littlemac", "little_mac"], #49
+            "Greninja": ["50", "gren", "greninja", "gekkouga"], #50
+            "Mii Brawler": ["51", "miibrawler", "mii_brawler", "brawler", "mii1"], #51
+            "Mii Swordfighter": ["52", "miiswordfighter", "miiswordie", "mii_swordfighter", "mii_swordie", "swordfighter", "swordie", "mii2"], #52
+            "Mii Gunner": ["53", "miigunner", "mii_gunner", "gunner", "mii3"], #53
+            "Palutena": ["54", "palu", "palutena", "washingmachine"], #54
+            "PAC-MAN": ["55", "pac", "pacman", "pac_man"], #55
+            "Robin": ["56", "robin", "swordie4"], #56
+            "Shulk": ["57", "shulk"], #57
+            "Bowser Jr.": ["58", "bowserjr", "bowser_jr", "koopajr", "koopa_jr", "princekoopa", "prince_koopa", "ludwig", "larry", "morton", "wendy", "iggy", "roy2", "royk", "roykoopa", "roy_koopa", "lemmy"], #58
+            "Duck Hunt": ["59", "duckhunt", "dh", "duck", "duckhuntduo", "duck_hunt_duo", "fakebanjo"], #59
+            "Ryu": ["60", "ryu", "shoto"], #60
+            "Ken": ["60e", "ken", "shotoe"], #60e
+            "Cloud": ["61", "cloud", "strife", "cloudstrife", "cloud_strife"], #61
+            "Corrin": ["62", "corrin", "corn", "swordie5"], #62
+            "Bayonetta": ["63", "bayo", "bayonetta", "sm4sh"], #63
+            "Inkling": ["64", "inkling", "inklinggirl", "inklingboy", "inkling_girl", "inkling_boy"], #64
+            "Ridley": ["65", "ridley"], #65
+            "Simon": ["66", "simon", "belmont", "simonbelmont", "simon_belmont"], #66
+            "Richter": ["66e", "richter", "belmonte", "richterbelmont", "richter_belmont"], #66e
+            "King K. Rool": ["67", "krool", "rool", "kkr", "kingkrool", "king_krool"], #67
+            "Isabelle": ["68", "isabelle", "isa", "belle", "bell", "is_a_belle", "shizue"], #68
+            "Incineroar": ["69", "incineroar", "incin", "gaogaen"], #69
+            "Piranha Plant": ["70", "piranhaplant", "piranha_plant", "plant", "plantgang"], #70
+            "Joker": ["71", "joker", "arsene", "ultimate"], #71
+            "Hero": ["72", "hero", "luminary", "eight", "erdrick", "solo", "slotmachine", "goku", "trunks", "c17"], #72
+            "Banjo & Kazooie": ["73", "banjo", "kazooie", "bk", "banjokazooie", "banjo&kazooie", "banjonkazooie", "banjo_kazooie", "banjo_and_kazooie", "bear_and_bird"], #73
+            "Terry": ["74", "terry", "bogard", "terrybogard", "terry_bogard"], #74
+            "Byleth": ["75", "byleth", "swordie6"], #75
+            "Min Min": ["76", "minmin", "min_min"], #76
+            "Steve": ["77", "steve", "alex", "zombie", "enderman", "ender", "herobrine", "trump"], #77
+            "Sephiroth": ["78", "sephiroth", "seph"], #78
+            "Pyra / Mythra": ["79", "80", "pyra", "mythra", "pyramythra", "pyra_mythra", "pm", "aegis"], #79-80
+            "Kazuya": ["81", "kazuya", "mishima", "kazuyamishima", "kazuya_mishima", "devil"], #81
+            "Random": ["0", "random", "?", "idk", "jesustakethewheel"] #random
         }
         self.isDSR = False
         self.isMDSR = True
@@ -378,14 +378,20 @@ def initServer(guildId, rankingRole="Ranking1v1", adminRankingRoles=["RankingSta
 
 def getBotRole(client, guildId):
     guild = client.get_guild(guildId)
-    myRole = discord.utils.get(guild.roles, name="ChallengeMe")    
-    return myRole
+    for role in guild.roles:
+        if role.name == "ChallengeMe" or role.name == "ChallengeMe-QA" or role.name == "ChallengeMe-DEV":
+            return role
+
+    return None
 
 def getRankingRole(client, guildId):
     guild = client.get_guild(guildId)
     myRoleName = GuildSettings.getRankingRole(guild.id)
-    myRole = discord.utils.get(guild.roles, name=myRoleName)    
-    return myRole
+    for role in guild.roles:
+        if role.name == myRoleName:
+            return role
+   
+    return None
 
 def getAdminRankingRoles(client, guildId):
     guild = client.get_guild(guildId)
@@ -393,9 +399,10 @@ def getAdminRankingRoles(client, guildId):
     returnRoles = []
     if myRoles:
         for myRoleName in myRoles:
-            myRole = discord.utils.get(guild.roles, name=myRoleName)
-            if myRole is not None:
-                returnRoles.append(myRole)
+            for role in guild.roles:
+                if role.name == myRoleName:
+                    returnRoles.append(role)
+                    pass                
     
     return returnRoles
 
@@ -664,13 +671,15 @@ async def createMatchChannel(client, guildId, player1, player2):
     adminRoles = getAdminRankingRoles(client, guildId)
     for adminRole in adminRoles:
         await category.set_permissions(adminRole, view_channel=True, send_messages=True)
+        await textDiscussionChannel.set_permissions(adminRole, view_channel=True, send_messages=True)
 
     await category.set_permissions(user1, view_channel=True, send_messages=False)
     await category.set_permissions(user2, view_channel=True, send_messages=False)
 
-    await textDiscussionChannel.set_permissions(user1, send_messages=True)
-    await textDiscussionChannel.set_permissions(user2, send_messages=True)
+    await textDiscussionChannel.set_permissions(user1, view_channel=True, send_messages=True)
+    await textDiscussionChannel.set_permissions(user2, view_channel=True, send_messages=True)
 
+    await textDiscussionChannel.set_permissions(everyoneRole, view_channel=False)
     await category.set_permissions(everyoneRole, view_channel=False)
     
     return textMatchChannel.id
