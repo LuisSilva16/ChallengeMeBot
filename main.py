@@ -43,40 +43,6 @@ adminCommands = adminUserCommands + adminChannelCommands + adminTextCommands
 
 @client.event
 async def on_ready():   
-    # QA PURGE
-    channel = client.get_channel(867109176152162324)
-    await channel.purge(limit=100)
-    
-    channel = client.get_channel(867109161212706826)
-    await channel.purge(limit=100)
-
-    channel = client.get_channel(867109141134573609)
-    await channel.purge(limit=100)
-
-    channel = client.get_channel(867109072108912652)
-    await channel.purge(limit=1)
-
-    # DEV PURGE
-
-    channel = client.get_channel(867024058175979550)
-    await channel.purge(limit=100)
-    
-    channel = client.get_channel(865882258636406804)
-    await channel.purge(limit=100)
-
-    channel = client.get_channel(865882224553623552)
-    await channel.purge(limit=100)
-
-    channel = client.get_channel(865593981164847115)
-    await channel.purge(limit=1)
-
-    print('We have logged in as {0.user}'.format(client))
-    
-    message = await channel.send("React to me! \nUse our commands that you can find by typing \"!matchhelp\"")
-    await message.add_reaction("🥏")
-    
-    match.ready(863389639901052969, message.id)
-
     queue_to_match.start()
 
 @client.event
