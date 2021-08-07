@@ -45,6 +45,7 @@ adminCommands = adminUserCommands + adminChannelCommands + adminTextCommands
 async def on_ready():   
     queue_to_match.start()
 
+
 @client.event
 async def on_message(message):
     if message.author == client.user:
