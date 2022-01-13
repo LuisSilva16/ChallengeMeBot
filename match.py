@@ -224,6 +224,7 @@ class Ruleset:
             "Sephiroth": ["78", "sephiroth", "seph"], #78
             "Pyra / Mythra": ["79", "80", "pyra", "mythra", "pyramythra", "pyra_mythra", "pm", "aegis"], #79-80
             "Kazuya": ["81", "kazuya", "mishima", "kazuyamishima", "kazuya_mishima", "devil"], #81
+			"Sora": ["82", "sora", "roxas", "didsomeonementionthedoortodarkness"], #82
             "Random": ["0", "random", "?", "idk", "jesustakethewheel"] #random
         }
         self.isDSR = False
